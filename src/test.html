@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .over{
+            /*-webkit-animation: rotator 1.5s ease-in-out infinite;*/
+            stroke-dasharray: 107,38;
+            position: fixed;
+            transform-origin: 50% 50%;
+            transform: rotate(-90deg);
+        }
+        .bag{
+            position: absolute;
+        }
+        @-webkit-keyframes rotator {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="circleContainer">
+    <svg class="bag" height="100" width="100">
+        <circle cx="50" cy="50" r="50" stroke="#F8BBD0" stroke-width="3" fill="none">
+
+        </circle>
+    </svg>
+    <svg class="over" height="100" width="100">
+        <circle cx="50" cy="50" r="40" stroke="#E91E63" stroke-width="3" fill="none" stroke-dasharray="100.53096491487338,251.32741228718345"></circle>
+    </svg>
+</div>
+
+<!--<div style="width: 600px; margin: auto">-->
+    <!--<div class="container">-->
+        <!--<svg class="bag" height="100" width="100">-->
+            <!--<circle  cx="50" cy="50" r="40" stroke="#F8BBD0" stroke-width="3" fill="none">-->
+            <!--</circle>-->
+        <!--</svg>-->
+        <!--<svg class="over" height="100" width="100">-->
+            <!--<circle  cx="50" cy="50" r="40" stroke="#E91E63" stroke-width="3" fill="none" stroke-dasharray="90,254">-->
+                <!--&lt;!&ndash;<animate attributeType="CSS" attributeName="stroke-dasharray" from="1,254" to="247,56" dur="5s" repeatCount="indefinite" />&ndash;&gt;-->
+            <!--</circle>-->
+        <!--</svg>-->
+    <!--</div>-->
+<!--</div>-->
+
+</body>
+</html>

@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import './App.css';
+import './css/App.css';
 import {SvgChart} from './charts';
 import {CardsSlider} from './cards';
 import {resultsForFood} from "./utils";
+import {Header} from "./header";
+import {FOOD_DATABASE} from "./data/database";
+import {CirclePercentage} from "./widgets/circlePercentage";
 
 
 class App extends Component {
@@ -16,7 +19,9 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <CardsSlider />
+                <Header />
+                <CirclePercentage width={100} strokeWidth={5} percentage={30}/>
+                <CardsSlider data={FOOD_DATABASE}/>
                 {/*<SvgChart />*/}
                 {/*<Result itemName="tomato"/>*/}
                 {/*<div style={{width: '800px', }}>*/}
