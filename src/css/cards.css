@@ -28,3 +28,40 @@
     text-align: left;
     position: relative;
 }
+.rightArrow{
+    top: 220px;
+    left: 1215px;
+    width: 80px;
+    position: absolute;
+}
+.leftArrow{
+    top: 220px;
+    left: 630px;
+    width: 80px;
+    position: absolute;
+    transform-origin: 50% 50%;
+    transform: rotate(180deg);
+}
+.topComparisonButton{
+    position: absolute;
+    width: 400px;
+    left: calc(50vw - 200px);
+    top: 0;
+}
+.bottomComparisonButton{
+    position: absolute;
+    width: 400px;
+    left: calc(50vw - 200px);
+    bottom: 0;
+}
+.SliderBigWrapper{
+    overflow: hidden;
+    width: 100%;
+    height: 460px;
+    position: relative;
+}
+.SlidersContainer{
+    textAlign: center;
+    position: absolute;
+    transition: top 0.4s ease-in-out;
+}

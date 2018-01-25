@@ -24,6 +24,8 @@ const findClosestCarbonValue = (value, otherCards) => {
 const START_LEFT = 127;
 const START_IX = 2;
 const MOVE_LEFT_EVERY_CARD = 272;
+const ONE_SLIDER_HEIGHT = 500;
+const SLIDER_START = 65;
 
 const leftDistance = (currentIx) => {
     return START_LEFT - (currentIx - START_IX) * MOVE_LEFT_EVERY_CARD;
@@ -145,20 +147,16 @@ export class Slider extends Component{
     };
 
     handleMoveVertically = top => {
-        let currentTypeIx = verticalOrder.indexOf(this.currentType());
-        console.log('currentTypeIx', currentTypeIx, 'verticalOrder', verticalOrder);
-        let newIx = currentTypeIx + 1 - 2 * top;
-        let newType = verticalOrder[newIx];
+        console.log('currentTypeIx', this.state.currentTypeIx, 'verticalOrder', verticalOrder);
+        let newIx = this.state.currentTypeIx + 1 - 2 * top;
 
         if ((newIx > verticalOrder.length - 1) || (newIx < 0)){
-            throw 'Problem with currentTypeIx';
+            // throw 'Problem with currentTypeIx';
+            return
         }
 
-        let newCardIx = top ? this.state.topButtonInfo.comparison.ixInType : this.state.bottomButtonInfo.comparison.ixInType;
-
         this.setState({
-            currentType: newType,
-            currentCardIx: newCardIx,
+            currentTypeIx: newIx,
         }, this.updateComparison);
     };
 
@@ -180,36 +178,28 @@ export class Slider extends Component{
     handleMoveLeft5 = () => {this.moveCards(-5)};
 
     render(){
-        console.log('slider render', this.state);
-        if (this.state.topButtonInfo){
-            ;
-        }
-        if (this.state.bottomButtonInfo){
+        let topButton = '';
+        let bottomButton = '';
 
+        if (this.state.topButtonInfo || true) {
+            topButton = <button className="button topComparisonButton" onClick={this.handleGoToTop}>
+                Compare with {this.state.topButtonInfo.type} - {this.state.topButtonInfo.comparison && this.state.topButtonInfo.comparison.text}
+            </button>;
         }
-
+        if (this.state.bottomButtonInfo || true) {
+            bottomButton = <button className="button bottomComparisonButton" onClick={this.handleGoToBottom}>
+                Compare with {this.state.bottomButtonInfo.type} - {this.state.bottomButtonInfo.comparison && this.state.bottomButtonInfo.comparison.text}
+            </button>;
+        }
 
         let sliders = verticalOrder.map((type, ix) => {
             let handleMove = null;
             // buttons
-            let topButton = '';
-            let bottomButton = '';
+
             let navButtons = '';
 
             if (ix === this.state.currentTypeIx){
                 handleMove = this.handleCardsMove;
-
-                if (this.state.topButtonInfo) {
-                    topButton = <button className="button" onClick={this.handleGoToTop}>
-                        Compare with {this.state.topButtonInfo.type} - {this.state.topButtonInfo.comparison.text}
-                    </button>;
-                }
-
-                if (this.state.bottomButtonInfo) {
-                    bottomButton = <button className="button" onClick={this.handleGoToBottom}>
-                        Compare with {this.state.bottomButtonInfo.type} - {this.state.bottomButtonInfo.comparison.text}
-                    </button>;
-                }
 
                 navButtons = <div style={{textAlign: 'center'}}>
                     <button className={'button'} onClick={this.handleMoveFirst}>First</button>
@@ -220,13 +210,30 @@ export class Slider extends Component{
                     <button className={'button'} onClick={this.handleMoveLast}>Last</button>
                 </div>;
             }
-            let slider = <CardsSlider cards={this.cards[type]} currentCardIx={this.state.currentCardIndices[ix]} />;
-            let space = ix == 0 ? '' : <div style={{marginTop: '350px'}}></div>;
-            return <div>{topButton} {navButtons} {slider} {bottomButton} {space}</div>;
+            let slider = <CardsSlider cards={this.cards[type]} currentCardIx={this.state.currentCardIndices[ix]} key={'slider-' + ix}/>;
+            // let space = ix == 0 ? '' : <div style={{marginTop: '350px'}}></div>;
+            let space = '';
+            return <div style={{height: '500px'}}>
+                {/*{topButton}*/}
+                {/*{navButtons}*/}
+                {slider}
+                {/*{bottomButton}*/}
+                </div>;
         });
 
-        return <div style={{textAlign: 'center'}}>
-            {sliders}
+        let navigation = <div>
+            {topButton}
+            <img src="/img/right_arrow.png" alt="right arrow" className={'rightArrow'} onClick={() => {console.log('CLICKARROW'); this.handleMoveRight()}}/>
+            <img src="/img/right_arrow.png" alt="right arrow" className={'leftArrow'} onClick={this.handleMoveLeft}/>
+            {bottomButton}
+        </div>;
+
+        return <div className={'SliderBigWrapper'}>
+            {/*{navigation}*/}
+            <div className={'SlidersContainer'} style={{top: (-this.state.currentTypeIx * ONE_SLIDER_HEIGHT + SLIDER_START)+ 'px'}}>
+                {sliders}
+            </div>
+            {navigation}
         </div>
     }
 }
