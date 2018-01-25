@@ -198,8 +198,8 @@ export const TRANSPORT_DATABASE = [
             {
                 name: 'Emissions for all passangers, long distance flight',
                 value: 5000 * 300,
-                comparisonTime: 'city',
-                comparisonSize: 'daily',
+                comparisonTime: 'daily',
+                comparisonSize: 'city',
             },
             {
                 name: 'How much a car is used annualy',
@@ -240,7 +240,7 @@ export const TRANSPORT_DATABASE = [
             {
                 name: 'A bike life expectancy',
                 value: 10000,
-                comparisonTime: 'montly',
+                comparisonTime: 'monthly',
                 comparisonSize: 'personal',
             },
         ],

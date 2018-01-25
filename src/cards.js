@@ -80,10 +80,10 @@ export class Slider extends Component{
         super();
         this.cards = buildAllCards();
         this.state = {
-            currentCardIx: 2,
+            currentCardIndices: verticalOrder.map(type => type === 'food' ? 2 : 0),
             topButtonInfo: '',
             bottomButtonInfo: '',
-            currentType: 'food',
+            currentTypeIx: 1,
         };
     }
 
@@ -91,12 +91,27 @@ export class Slider extends Component{
         this.updateComparison();
     };
 
+    currentType = () => verticalOrder[this.state.currentTypeIx];
+    currentCardIx = () => this.state.currentCardIndices[this.state.currentTypeIx];
+
     updateComparison = () => {
         console.log('update comparison');
         // get current carbon value
-        let currentCarbonValue = this.cards[this.state.currentType][this.state.currentCardIx].carbonValue;
+        let currentCarbonValue = this.cards[this.currentType()][this.currentCardIx()].carbonValue;
         // get top and bottom cards
-        let currentVerticalIx = verticalOrder.indexOf(this.state.currentType);
+        let currentVerticalIx = this.state.currentTypeIx;
+
+        let newCardIndices = Object.assign({}, this.state.currentCardIndices);
+
+        // for all other types, we update the index to the index whose carbon value
+        // is the closest to the current one
+        verticalOrder.forEach((type, ix) => {
+            if (ix === this.state.currentTypeIx){
+                return
+            }
+            let res = findClosestCarbonValue(currentCarbonValue, this.cards[type]);
+            newCardIndices[ix] = res['ixInType'];
+        });
 
         let topInfo = '';
         let bottomInfo = '';
@@ -116,19 +131,21 @@ export class Slider extends Component{
         this.setState({
             topButtonInfo: topInfo,
             bottomButtonInfo: bottomInfo,
+            currentCardIndices: newCardIndices,
         });
     };
 
     handleCardsMove = (increment) => {
-        console.log('handle cards move', this.state.currentCardIx, increment);
+        console.log('handle cards move', this.currentCardIx(), increment);
         this.setState((prevState) => {
-            return {currentCardIx: prevState.currentCardIx + increment};
-        });
-        this.updateComparison();
+            let newCardIndices = Object.assign({}, prevState.currentCardIndices);
+            newCardIndices[prevState.currentTypeIx] += increment;
+            return {currentCardIndices: newCardIndices};
+        }, this.updateComparison);
     };
 
     handleMoveVertically = top => {
-        let currentTypeIx = verticalOrder.indexOf(this.state.currentType);
+        let currentTypeIx = verticalOrder.indexOf(this.currentType());
         console.log('currentTypeIx', currentTypeIx, 'verticalOrder', verticalOrder);
         let newIx = currentTypeIx + 1 - 2 * top;
         let newType = verticalOrder[newIx];
@@ -148,42 +165,73 @@ export class Slider extends Component{
     handleGoToTop = () => {this.handleMoveVertically(true)};
     handleGoToBottom = () => {this.handleMoveVertically(false)};
 
+    moveCards = (increment) => {
+        // make sure we don't move further than 0 or max
+        increment = Math.max(-this.currentCardIx(), increment);
+        increment = Math.min((this.cards[this.currentType()].length - this.currentCardIx() - 1), increment);
+        this.handleCardsMove(increment);
+    };
+
+    handleMoveRight = () => {this.moveCards(1)};
+    handleMoveRight5 = () => {this.moveCards(5)};
+    handleMoveFirst = () => {this.moveCards(-this.currentCardIx())};
+    handleMoveLast = () => {this.moveCards(this.cards[this.currentType()].length - this.currentCardIx()- 1)};
+    handleMoveLeft = () => {this.moveCards(-1)};
+    handleMoveLeft5 = () => {this.moveCards(-5)};
+
     render(){
-        let topButton = '';
-        let bottomButton = '';
         console.log('slider render', this.state);
         if (this.state.topButtonInfo){
-            topButton = <button className="button" onClick={this.handleGoToTop}>Compare with {this.state.topButtonInfo.type} - {this.state.topButtonInfo.comparison.text}</button>;
+            ;
         }
         if (this.state.bottomButtonInfo){
-            bottomButton = <button className="button" onClick={this.handleGoToBottom}>Compare with {this.state.bottomButtonInfo.type} - {this.state.bottomButtonInfo.comparison.text}</button>;
+
         }
 
+
+        let sliders = verticalOrder.map((type, ix) => {
+            let handleMove = null;
+            // buttons
+            let topButton = '';
+            let bottomButton = '';
+            let navButtons = '';
+
+            if (ix === this.state.currentTypeIx){
+                handleMove = this.handleCardsMove;
+
+                if (this.state.topButtonInfo) {
+                    topButton = <button className="button" onClick={this.handleGoToTop}>
+                        Compare with {this.state.topButtonInfo.type} - {this.state.topButtonInfo.comparison.text}
+                    </button>;
+                }
+
+                if (this.state.bottomButtonInfo) {
+                    bottomButton = <button className="button" onClick={this.handleGoToBottom}>
+                        Compare with {this.state.bottomButtonInfo.type} - {this.state.bottomButtonInfo.comparison.text}
+                    </button>;
+                }
+
+                navButtons = <div style={{textAlign: 'center'}}>
+                    <button className={'button'} onClick={this.handleMoveFirst}>First</button>
+                    <button className={'button'} onClick={this.handleMoveLeft5}>Previous 5</button>
+                    <button className={'button'} onClick={this.handleMoveLeft}>Previous</button>
+                    <button className={'button'} onClick={this.handleMoveRight}>Next</button>
+                    <button className={'button'} onClick={this.handleMoveRight5}>Next 5</button>
+                    <button className={'button'} onClick={this.handleMoveLast}>Last</button>
+                </div>;
+            }
+            let slider = <CardsSlider cards={this.cards[type]} currentCardIx={this.state.currentCardIndices[ix]} />;
+            let space = ix == 0 ? '' : <div style={{marginTop: '350px'}}></div>;
+            return <div>{topButton} {navButtons} {slider} {bottomButton} {space}</div>;
+        });
+
         return <div style={{textAlign: 'center'}}>
-            {topButton}
-            <CardsSlider cards={this.cards[this.state.currentType]} currentCardIx={this.state.currentCardIx} handleMove={this.handleCardsMove}/>
-            <div style={{marginTop: '350px'}}></div>
-            {bottomButton}
+            {sliders}
         </div>
     }
 }
 
 class CardsSlider extends Component{
-
-    moveCards = (increment) => {
-        // make sure we don't move further than 0 or max
-        increment = Math.max(-this.props.currentCardIx, increment);
-        increment = Math.min((this.props.cards.length - this.props.currentCardIx - 1), increment);
-
-        this.props.handleMove(increment);
-    };
-
-    handleMoveRight = () => {this.moveCards(1)};
-    handleMoveRight5 = () => {this.moveCards(5)};
-    handleMoveFirst = () => {this.moveCards(-this.props.currentCardIx)};
-    handleMoveLast = () => {this.moveCards(this.props.cards.length - this.props.currentCardIx- 1)};
-    handleMoveLeft = () => {this.moveCards(-1)};
-    handleMoveLeft5 = () => {this.moveCards(-5)};
 
     render(){
         console.log('cardsSlider render', this.props.cards);
@@ -192,14 +240,6 @@ class CardsSlider extends Component{
         let cards = this.props.cards.map((card, ix) =>
             <Card data={card} central={this.props.currentCardIx === ix} key={ix}/>);
         return <div className={'sliderWrapper'}>
-            <div style={{textAlign: 'center'}} onClick={() => console.log('click on button wrapper')}>
-                <button className={'button'} onClick={this.handleMoveFirst}>First</button>
-                <button className={'button'} onClick={this.handleMoveLeft5}>Previous 5</button>
-                <button className={'button'} onClick={this.handleMoveLeft}>Previous</button>
-                <button className={'button'} onClick={this.handleMoveRight}>Next</button>
-                <button className={'button'} onClick={this.handleMoveRight5}>Next 5</button>
-                <button className={'button'} onClick={this.handleMoveLast}>Last</button>
-            </div>
             <div className={'cardsWrapper'} style={{left: leftDistance(this.props.currentCardIx) + 'px'}}>
                 {cards}
             </div>
@@ -212,9 +252,15 @@ class Card extends Component{
         let inside = '';
 
         if (this.props.central){
+            if (QUOTA[this.props.data.value.comparisonSize] === undefined)
+                console.warn('QUOTA undefined', this.props.data.value.comparisonSize);
+
             let quota = QUOTA[this.props.data.value.comparisonSize][this.props.data.value.comparisonTime];
             let foodQuota = QUOTA_PER_CATEGORY['food'] * quota;
+
             let percentageText = QUOTA_TEXT[this.props.data.value.comparisonSize][this.props.data.value.comparisonTime];
+            if (percentageText === undefined)
+                console.warn('percentage text undefined', this.props.data.value.comparisonSize, this.props.data.value.comparisonTime);
             let firstPercentageText = percentageText.replace('%TYPE%', '');
             let secondPercentageText = percentageText.replace('%TYPE%', 'food');
 
