@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import './css/App.css';
 import {SvgChart} from './charts';
-import {CardsSlider} from './cards';
+import {Slider} from './cards';
 import {resultsForFood} from "./utils";
 import {Header} from "./header";
 import {FOOD_DATABASE} from "./data/database";
-import {CirclePercentage} from "./widgets/circlePercentage";
+import {CirclePercentage, CirclePercentageWrapper} from "./widgets/circlePercentage";
 
 
 class App extends Component {
@@ -20,8 +20,7 @@ class App extends Component {
         return (
             <div className="App">
                 <Header />
-                <CirclePercentage width={100} strokeWidth={5} percentage={30}/>
-                <CardsSlider data={FOOD_DATABASE}/>
+                <Slider />
                 {/*<SvgChart />*/}
                 {/*<Result itemName="tomato"/>*/}
                 {/*<div style={{width: '800px', }}>*/}

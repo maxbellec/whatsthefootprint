@@ -1,11 +1,10 @@
 .card{
     border-radius: 5px;
-    box-shadow: 0 0 3px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 0 3px 3px rgba(0,0,0,0.05);
     padding: 20px;
-    border: 1px solid rgba(0,0,0,0.2);
-    min-width: 300px;
+    border: 1px solid rgba(0,0,0,0.1);
     display: inline-block;
-    width: 350px;
+    width: 200px;
     text-align: center;
     height: 250px;
     margin-top: 50px;
@@ -16,7 +15,7 @@
 .card-central{
     width: 500px;
     height: 300px;
-    margin-top: 0px;
+    margin-top: 0;
     margin-left: 20px;
     margin-right: 50px;
 }
