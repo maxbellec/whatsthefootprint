@@ -76,10 +76,9 @@ const buildAllCards = () => {
 let verticalOrder = ['transport', 'food'];
 
 export class Slider extends Component{
-    constructor(props){
+    constructor(){
         super();
         this.cards = buildAllCards();
-        console.log('transport cards', this.transportCards);
         this.state = {
             currentCardIx: 2,
             topButtonInfo: '',
@@ -122,7 +121,7 @@ export class Slider extends Component{
 
     handleCardsMove = (increment) => {
         console.log('handle cards move', this.state.currentCardIx, increment);
-        this.setState((prevState, props) => {
+        this.setState((prevState) => {
             return {currentCardIx: prevState.currentCardIx + increment};
         });
         this.updateComparison();
@@ -170,12 +169,6 @@ export class Slider extends Component{
 }
 
 class CardsSlider extends Component{
-    constructor(props){
-        super();
-        this.state = {
-            left: leftDistance(props.currentCardIx),
-        };
-    }
 
     moveCards = (increment) => {
         // make sure we don't move further than 0 or max
@@ -183,11 +176,6 @@ class CardsSlider extends Component{
         increment = Math.min((this.props.cards.length - this.props.currentCardIx - 1), increment);
 
         this.props.handleMove(increment);
-        this.setState((prevState, props) => {
-            return {
-                left:START_LEFT - (this.props.currentCardIx + increment - START_IX) * MOVE_LEFT_EVERY_CARD,
-            };
-        });
     };
 
     handleMoveRight = () => {this.moveCards(1)};
@@ -202,7 +190,7 @@ class CardsSlider extends Component{
         if (this.props.cards === undefined)
             return null;
         let cards = this.props.cards.map((card, ix) =>
-            <Card data={card} central={this.props.currentCardIx === ix} key={ix} onClick={() => {console.log('click on card', ix); this.moveCards(ix - this.state.currentCardId)}}/>);
+            <Card data={card} central={this.props.currentCardIx === ix} key={ix}/>);
         return <div className={'sliderWrapper'}>
             <div style={{textAlign: 'center'}} onClick={() => console.log('click on button wrapper')}>
                 <button className={'button'} onClick={this.handleMoveFirst}>First</button>
@@ -220,11 +208,6 @@ class CardsSlider extends Component{
 }
 
 class Card extends Component{
-    constructor(props){
-        super();
-        this.showBottom = true;
-    }
-
     render(){
         let inside = '';
 
