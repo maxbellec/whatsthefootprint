@@ -16,10 +16,15 @@ class App extends Component {
     }
   }
 
+  handleSearchResult = (event) => {
+    this.setState({searchValue: event.target.value});
+    console.log('handleSearchChange', event.target.value);
+  };
+
   render() {
     return (
       <div className="App">
-        <Header />
+        <Header handleSearchResult={this.handleSearchResult}/>
         <Slider />
         {/*<SvgChart />*/}
         {/*<Result itemName="tomato"/>*/}
