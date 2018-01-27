@@ -4,8 +4,6 @@ import {SvgChart} from './charts';
 import {Slider} from './cards';
 import {resultsForFood} from "./utils";
 import {Header} from "./header";
-import {FOOD_DATABASE} from "./data/database";
-import {CirclePercentage, CirclePercentageWrapper} from "./widgets/circlePercentage";
 
 
 class App extends Component {

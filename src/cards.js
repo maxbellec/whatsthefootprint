@@ -1,12 +1,12 @@
 import React, {Component} from "react";
 import './css/cards.css';
 import {CirclePercentageWrapper} from "./widgets/circlePercentage";
-import {FOOD_DATABASE, QUOTA, QUOTA_PER_CATEGORY, QUOTA_TEXT, TRANSPORT_DATABASE} from "./data/database";
+import {DATABASE, QUOTA, QUOTA_PER_CATEGORY, QUOTA_TEXT} from "./data/database";
 import {formatNumber} from "./utils";
 
 const findClosestCarbonValue = (value, otherCards) => {
-  // TODO this could be very much optimised
-
+  // note: if there are a lot of cards, this should be optimized by using a
+  // binary search since cards are sorted
   let toReturn = {};
   let closestDistance = Infinity;
   otherCards.forEach((card, ix) => {
@@ -32,19 +32,17 @@ const leftDistance = (currentIx) => {
 };
 
 const buildCards = dataType => {
-  let data = {};
   let unit = '';
   if (dataType === 'food'){
-    data = FOOD_DATABASE;
     unit = 'kg';
   }
   else if (dataType === 'transport'){
-    data = TRANSPORT_DATABASE;
     unit = 'km';
   }
   else{
     throw "expected dataType to be one of (food, transport, ...), was " + dataType;
   }
+  let data = DATABASE[dataType];
 
   let cards = [];
   data.forEach(foodData => {
