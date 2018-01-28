@@ -26,39 +26,15 @@ export class Header extends Component{
     console.log('new search value', newValue);
   };
 
-  // handleEnterPress = (event) => {
-  //   console.log('key down', event.key);
-  //   if (event.key !== 'Enter')
-  //     return;
-  //   console.log('OK, enter!', parse(this.state.searchValue));
-  // };
-  //
-  // handleListClick = (resultIx) => {
-  //   console.log('handleListClick', resultIx);
-  // };
-
   handleResult = resultIx => {
     this.props.handleSearchResult(this.state.results[resultIx]);
   };
 
   render(){
-    // show first result
-    let sentence = '';
-    if (this.state.searchValue.length > 0){
-      let results = parse(this.state.searchValue);
-      if (results.length){
-        console.log('first result', results[0], results.length, results);
-        let result = results[0].words;
-        if (result)
-          sentence = result.map(data => <span style={{color: data.input ? 'black': 'grey'}}>{data.text}</span>);
-      }
-    }
-
     return <div style={{textAlign: 'center', marginTop: '10px', marginBottom: '20px'}}>
       <img src="/logo.png" alt="logo tomato" style={{'width': '22%'}}/>
       <SearchBar searchValue={this.state.searchValue} handleChange={this.handleSearchChange}
                  handleResult={this.handleResult} results={this.state.results}/>
-      <h3>{sentence}</h3>
     </div>
   }
 }
