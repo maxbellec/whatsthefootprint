@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import './css/cards.css';
 import {CirclePercentageWrapper} from "./widgets/circlePercentage";
-import {DATABASE, QUOTA, QUOTA_PER_CATEGORY, QUOTA_TEXT} from "./data/database";
+import {DATABASE, QUOTA, QUOTA_PER_CATEGORY, QUOTA_TEXT, VERTICAL_ORDER} from "./data/database";
 import {formatNumber} from "./utils";
 
 const findClosestCarbonValue = (value, otherCards) => {
@@ -39,6 +39,9 @@ const buildCards = dataType => {
   else if (dataType === 'transport'){
     unit = 'km';
   }
+  else if (dataType == 'items'){
+    unit: '';
+  }
   else{
     throw "expected dataType to be one of (food, transport, ...), was " + dataType;
   }
@@ -66,21 +69,20 @@ const buildCards = dataType => {
 
 const buildAllCards = () => {
   let toReturn = {};
-  verticalOrder.forEach(dataType => {
+  VERTICAL_ORDER.forEach(dataType => {
     toReturn[dataType] = buildCards(dataType)
   });
 
   return toReturn
 };
 
-let verticalOrder = ['transport', 'food'];
 
 export class Slider extends Component{
   constructor(){
     super();
     this.cards = buildAllCards();
     this.state = {
-      currentCardIndices: verticalOrder.map(type => type === 'food' ? 2 : 0),
+      currentCardIndices: VERTICAL_ORDER.map(type => type === 'food' ? 2 : 0),
       topButtonInfo: '',
       bottomButtonInfo: '',
       currentTypeIx: 1,
@@ -91,7 +93,7 @@ export class Slider extends Component{
     this.updateComparison();
   };
 
-  currentType = () => verticalOrder[this.state.currentTypeIx];
+  currentType = () => VERTICAL_ORDER[this.state.currentTypeIx];
   currentCardIx = () => this.state.currentCardIndices[this.state.currentTypeIx];
 
   updateComparison = () => {
@@ -105,7 +107,7 @@ export class Slider extends Component{
 
     // for all other types, we update the index to the index whose carbon value
     // is the closest to the current one
-    verticalOrder.forEach((type, ix) => {
+    VERTICAL_ORDER.forEach((type, ix) => {
       if (ix === this.state.currentTypeIx){
         return
       }
@@ -117,14 +119,14 @@ export class Slider extends Component{
     let bottomInfo = '';
     if (currentVerticalIx > 0){
       topInfo = {
-        comparison: findClosestCarbonValue(currentCarbonValue, this.cards[verticalOrder[currentVerticalIx - 1]]),
-        type: verticalOrder[currentVerticalIx - 1],
+        comparison: findClosestCarbonValue(currentCarbonValue, this.cards[VERTICAL_ORDER[currentVerticalIx - 1]]),
+        type: VERTICAL_ORDER[currentVerticalIx - 1],
       };
     }
-    if (currentVerticalIx < verticalOrder.length - 1){
+    if (currentVerticalIx < VERTICAL_ORDER.length - 1){
       bottomInfo = {
-        comparison: findClosestCarbonValue(currentCarbonValue, this.cards[verticalOrder[currentVerticalIx + 1]]),
-        type: verticalOrder[currentVerticalIx + 1],
+        comparison: findClosestCarbonValue(currentCarbonValue, this.cards[VERTICAL_ORDER[currentVerticalIx + 1]]),
+        type: VERTICAL_ORDER[currentVerticalIx + 1],
       };
     }
 
@@ -145,10 +147,10 @@ export class Slider extends Component{
   };
 
   handleMoveVertically = top => {
-    console.log('currentTypeIx', this.state.currentTypeIx, 'verticalOrder', verticalOrder);
+    console.log('currentTypeIx', this.state.currentTypeIx, 'VERTICAL_ORDER', VERTICAL_ORDER);
     let newIx = this.state.currentTypeIx + 1 - 2 * top;
 
-    if ((newIx > verticalOrder.length - 1) || (newIx < 0)){
+    if ((newIx > VERTICAL_ORDER.length - 1) || (newIx < 0)){
       // throw 'Problem with currentTypeIx';
       return
     }
@@ -190,7 +192,7 @@ export class Slider extends Component{
       </button>;
     }
 
-    let sliders = verticalOrder.map((type, ix) => {
+    let sliders = VERTICAL_ORDER.map((type, ix) => {
       let handleMove = null;
       // buttons
 

@@ -1,0 +1,12 @@
+.searchBarList{
+    list-style-type: none;
+    text-align: left;
+    margin-bottom: 0;
+    margin-top: 0.8rem;
+}
+.searchBarList > li {
+    cursor: pointer;
+}
+.searchBarList > li:hover {
+    background-color: rgba(15, 190, 233, 0.14);
+}

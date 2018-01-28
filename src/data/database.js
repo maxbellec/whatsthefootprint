@@ -867,4 +867,198 @@ export const DATABASE = {
       }
     },
   ],
+  'items': [
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 1,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'Jeans',
+      icon: 'jeans.svg',
+      carbonIntensity: 1,
+      possibleValues: [
+        {
+          name: 'Wearing a pair of jeans for a day',
+          value: 1,
+          comparisonTime: 'daily',
+          comparisonSize: 'personal',
+        },
+        {
+          name: 'Jeans life cycle',
+          value: 300,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        },
+      ]
+    },
+    {
+      name: 'T-Shirt',
+      icon: 'tshirt.svg',
+      carbonIntensity: 0.3,
+      possibleValues: [
+        {
+          name: 'Wearing a t-shirt for a day',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        },
+        {
+          name: 'T-shirt life cycle',
+          value: 50,
+          comparisonTime: 'monthly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'Shoes',
+      icon: 'shoes.svg',
+      carbonIntensity: 0.05,
+      possibleValues: [
+        {
+          name: 'Wearing your pair of shoes for a day',
+          value: 1,
+          comparisonTime: 'daily',
+          comparisonSize: 'personal',
+        },
+        {
+          name: 'A pair of shoes life cycle',
+          value: 300,
+          comparisonTime: 'daily',
+          comparisonSize: 'personal',
+        },
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 100,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 500,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 1000,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 2000,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 5000,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 10000,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 0.1,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+    {
+      name: 'phone',
+      icon: 'phone.svg',
+      carbonIntensity: 0.01,
+      possibleValues: [
+        {
+          name: '',
+          value: 1,
+          comparisonTime: 'yearly',
+          comparisonSize: 'personal',
+        }
+      ]
+    },
+  ]
 };
+
+let verticalOrder = [];
+for (let e in DATABASE)
+  verticalOrder.push(e);
+
+export const VERTICAL_ORDER = verticalOrder;
+
+// items
+let items = {};
+VERTICAL_ORDER.forEach((itemType) => {
+  items[itemType] = [];
+  let typeItems = [];
+  for (let item in DATABASE[itemType]){
+    if (DATABASE[itemType].hasOwnProperty(item))
+      items[itemType].push(DATABASE[itemType][item].name);
+  }
+});
+export const ITEMS = items;

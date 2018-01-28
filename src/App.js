@@ -14,9 +14,9 @@ class App extends Component {
     }
   }
 
-  handleSearchResult = (event) => {
-    this.setState({searchValue: event.target.value});
-    console.log('handleSearchChange', event.target.value);
+  handleSearchResult = (result) => {
+    console.log('handleSearchResult', result);
+    console.log(result.result);
   };
 
   render() {

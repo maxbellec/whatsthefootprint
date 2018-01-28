@@ -7,20 +7,38 @@ export class Header extends Component{
     super();
     this.state = {
       searchValue: '',
+      results: parse(''),
     }
   }
 
   handleSearchChange = (event) => {
     let newValue = event.target.value;
-    this.setState({searchValue: newValue});
+    if (newValue === ''){
+      this.setState({
+        searchValue: '',
+        results: [],
+      })
+    }
+    this.setState({
+      searchValue: newValue,
+      results: parse(newValue),
+    });
     console.log('new search value', newValue);
   };
 
-  handleEnterPress = (event) => {
-    console.log('key down', event.key);
-    if (event.key !== 'Enter')
-      return;
-    console.log('OK, enter!', parse(this.state.searchValue));
+  // handleEnterPress = (event) => {
+  //   console.log('key down', event.key);
+  //   if (event.key !== 'Enter')
+  //     return;
+  //   console.log('OK, enter!', parse(this.state.searchValue));
+  // };
+  //
+  // handleListClick = (resultIx) => {
+  //   console.log('handleListClick', resultIx);
+  // };
+
+  handleResult = resultIx => {
+    this.props.handleSearchResult(this.state.results[resultIx]);
   };
 
   render(){
@@ -29,7 +47,7 @@ export class Header extends Component{
     if (this.state.searchValue.length > 0){
       let results = parse(this.state.searchValue);
       if (results.length){
-        console.log('first result', results[0]);
+        console.log('first result', results[0], results.length, results);
         let result = results[0].words;
         if (result)
           sentence = result.map(data => <span style={{color: data.input ? 'black': 'grey'}}>{data.text}</span>);
@@ -39,7 +57,7 @@ export class Header extends Component{
     return <div style={{textAlign: 'center', marginTop: '10px', marginBottom: '20px'}}>
       <img src="/logo.png" alt="logo tomato" style={{'width': '22%'}}/>
       <SearchBar searchValue={this.state.searchValue} handleChange={this.handleSearchChange}
-                 handleEnterPress={this.handleEnterPress}/>
+                 handleResult={this.handleResult} results={this.state.results}/>
       <h3>{sentence}</h3>
     </div>
   }

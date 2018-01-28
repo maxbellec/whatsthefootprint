@@ -1,5 +1,6 @@
 /** @jsx createElement */
 import {createElement, compile} from 'elliptical'
+import {ITEMS} from "../data/database";
 
 const transportUnitValues = [
   {text:'km', value: 'km'},
@@ -13,7 +14,7 @@ const transportUnitValues = [
 
 const TransportUnit = {
   describe(){
-    return <list items={transportUnitValues} />;
+    return <list items={transportUnitValues} limit={1}/>;
   }
 };
 
@@ -28,24 +29,26 @@ const transportMeansItems = [
 
 const TransportMeans = {
   describe(){
-    return <list items={transportMeansItems} />;
+    return <list items={transportMeansItems} limit={3}/>;
   }
 };
 
+// creating food, item, transportation items
+let foodItems = [];
+console.log('ITEMS', ITEMS);
+ITEMS['food'].forEach(item => foodItems.push({text: item, value: item}));
+console.log('FOOD ITEMS', foodItems);
+
 const FoodItems = {
   describe(){
-    return <list id={'foodItem'} items={[
-      {text: 'tomato', value: 'Tomato', qualifiers: ['tomato']},
-      {text: 'banana', value: 'Banana', qualifiers: ['banana']},
-      {text: 'onion', value: 'Onion', qualifiers: ['onion']},
-    ]} />;
+    return <list id={'foodItem'} items={foodItems} limit={3}/>;
   }
 };
 
 
 const FoodUnit = {
   describe(){
-    return <list items={['kg', 'kilograms', 'kilogram', 'l', 'liter', 'liters', 'gram', 'grams']} />;
+    return <list items={['kg', 'kilograms', 'kilogram', 'l', 'liter', 'liters', 'gram', 'grams']} limit={2}/>;
   }
 };
 
@@ -53,7 +56,7 @@ const Numbers = {
   describe(){
     return (
       <repeat separator={<literal text=''/>} max={9}>
-        <list items={NUMBERS}/>
+        <list items={NUMBERS} limit={1}/>
       </repeat>
     )
   }
@@ -61,20 +64,20 @@ const Numbers = {
 
 const TransportQualifier = {
   describe(){
-    return <list items={['by', 'with a', 'with', 'using a']}/>;
+    return <list items={['by', 'with a', 'with', 'using a']} limit={1}/>;
   }
 };
 
 const FoodQualifier = {
   describe(){
-    return <list items={['of']}/>;
+    return <list items={['of']} limit={1}/>;
   }
 };
 
 
 const NUMBERS = [
-  {text: '0', value:0},
   {text: '1', value:1},
+  {text: '0', value:0},
   {text: '2', value:2},
   {text: '3', value:3},
   {text: '4', value:4},
@@ -120,20 +123,20 @@ const grammar = (
         <choice limit={5} id="category">
           {/*transport */}
           <sequence argument="transport">
-            <TransportUnit id='unit'/>
+            <TransportUnit id='unit' limit={2}/>
             <Space />
-            <TransportQualifier />
+            <TransportQualifier limit={1}/>
             <Space />
-            <TransportMeans id='item'/>
+            <TransportMeans id='item' limit={2}/>
           </sequence>
 
           {/*food*/}
           <sequence argument='food'>
-            <FoodUnit id='unit'/>
+            <FoodUnit id='unit' limit={2}/>
             <Space />
-            <FoodQualifier />
+            <FoodQualifier limit={1}/>
             <Space />
-            <FoodItems id='item' />
+            <FoodItems id='item' limit={2}/>
           </sequence>
         </choice>
 
