@@ -18,15 +18,6 @@ const TransportUnit = {
   }
 };
 
-const transportMeansItems = [
-  {text: 'car', value: 'car'},
-  {text: 'bus', value: 'bus'},
-  {text: 'bike', value: 'bicycle'},
-  {text: 'plane', value: 'plane'},
-  {text: 'bicycle', value: 'bicycle'},
-  {text: 'motorbike', value: 'motorbike'},
-];
-
 const TransportMeans = {
   describe(){
     return <list items={transportMeansItems} limit={3}/>;
@@ -38,6 +29,8 @@ let foodItems = [];
 console.log('ITEMS', ITEMS);
 ITEMS['food'].forEach(item => foodItems.push({text: item, value: item}));
 console.log('FOOD ITEMS', foodItems);
+let transportMeansItems = [];
+ITEMS['transport'].forEach(item => transportMeansItems.push({text: item, value: item}));
 
 const FoodItems = {
   describe(){

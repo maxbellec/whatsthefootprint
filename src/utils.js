@@ -111,34 +111,24 @@ export const findClosestCarbonValue = (value, otherCards) => {
   return toReturn;
 };
 
+export const UNIT_FROM_VERTICAL = {
+  food: 'kg',
+  transport: 'km',
+  items: 'item',
+};
+
 const buildCards = dataType => {
-  let unit = '';
-  if (dataType === 'food'){
-    unit = 'kg';
-  }
-  else if (dataType === 'transport'){
-    unit = 'km';
-  }
-  else if (dataType === 'items'){
-    unit = '';
-  }
-  else{
-    throw "expected dataType to be one of (food, transport, ...), was " + dataType;
-  }
+  let unit = UNIT_FROM_VERTICAL[dataType];
+  if (unit === undefined)
+    throw 'Missing unit ' + dataType;
+
   console.log('buildAllcards, datatype', dataType);
   let data = DATABASE[dataType];
 
   let cards = [];
-  data.forEach(foodData => {
-    foodData.possibleValues.forEach(value => {
-      cards.push({
-        name: foodData.name,
-        icon: foodData.icon,
-        value: value,
-        carbonValue: value.value * foodData.carbonIntensity,
-        carbonBreakdown: foodData.carbonBreakdown,
-        nameWithValue: foodData.name + ' (' + formatNumber(value.value) + ' ' + unit + ')',
-      })
+  data.forEach(cardData => {
+    cardData.possibleValues.forEach(value => {
+      cards.push(cardFromData(cardData, value, unit))
     })
   });
 
@@ -146,6 +136,17 @@ const buildCards = dataType => {
   cards.sort((card, card_other) => card.carbonValue - card_other.carbonValue);
 
   return cards;
+};
+
+export const cardFromData = (data, value, unit) => {
+  return {
+    name: data.name,
+    icon: data.icon,
+    value: value,
+    carbonValue: value.value * data.carbonIntensity,
+    carbonBreakdown: data.carbonBreakdown,
+    nameWithValue: data.name + ' (' + formatNumber(value.value) + ' ' + unit + ')',
+  }
 };
 
 export const buildAllCards = () => {
