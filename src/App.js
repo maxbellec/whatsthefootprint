@@ -105,6 +105,7 @@ class App extends Component {
   // current vertical
   currentType = () => VERTICAL_ORDER[this.state.currentTypeIx];
   currentCardIx = () => this.state.currentCardIndices[this.state.currentTypeIx];
+  currentCard = () => this.state.cards[this.currentType()][this.currentCardIx()];
 
   /* align vertical items */
   updateComparison = () => {
@@ -184,6 +185,7 @@ class App extends Component {
         <Header handleSearchResult={this.handleSearchResult} searchValue={this.state.searchValue}
                 updateSearchValue={this.updateSearchValue} searchResults={this.state.searchResults}
                 handleSearchChange={this.handleSearchChange}/>
+        <SvgChart carbonValue={this.currentCard().carbonValue}/>
         {/*<SvgChart />*/}
         <Slider currentTypeIx={this.state.currentTypeIx} currentCardIndices={this.state.currentCardIndices}
                 topButtonInfo={this.state.topButtonInfo} bottomButtonInfo={this.state.bottomButtonInfo}

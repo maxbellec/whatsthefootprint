@@ -3,6 +3,14 @@ import {VERTICAL_ORDER} from "./data/database";
 import {DATABASE} from "./data/database";
 
 export const insideSvgCoordinates = (ev) => {
+  // https://stackoverflow.com/a/20958980/3218806
+  let demo = document.getElementById('svgChart');
+  let pt = demo.createSVGPoint();
+  pt.x = ev.clientX;
+  pt.y = ev.clientY;
+  let svgGlobal = pt.matrixTransform(demo.getScreenCTM().inverse());
+  return {x: svgGlobal.x, y: svgGlobal.y};
+  // svgGlobal.x and svgGlobal.y are now in SVG coordinates
   let e = ev.target;
   let dim = e.getBoundingClientRect();
   let x = ev.clientX - dim.left;

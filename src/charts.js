@@ -8,41 +8,42 @@ const afterZoomParams = (prevState, coeff) => {
   // widthPropotion**3 * scale is unchanged
   // so newWidthProp**3 = 2 * oldWidthProp**3
   // newWidthProp = 2**(1/3)
-  const newWidthProportion = prevState.curveX / prevState.width * (1 / coeff)**(1/3);
+  const newWidthProportion = prevState.curveX / SVG_WIDTH * (1 / coeff)**(1/3);
   return {
-    curveX: newWidthProportion * prevState.width,
-    curveY: (1 - newWidthProportion**3) * prevState.height,
-    curveScale: coeff * prevState.curveScale,
+    curveX: newWidthProportion * SVG_WIDTH,
+    curveY: (1 - newWidthProportion**3) * SVG_HEIGHT,
+    maxCarbonValue: coeff * prevState.maxCarbonValue,
   }
 };
 
-const updateParams = (widthProportion, scale, width, height) => {
-  console.log('new params', widthProportion, scale, width, height);
+const updateParams = (widthProportion, scale, fullSize) => {
   return {
-    curveY: (1 - widthProportion**3) * height,
-    curveX: widthProportion * width,
+    curveY: (1 - widthProportion**3) * SVG_HEIGHT,
+    curveX: widthProportion * SVG_WIDTH,
     currentCarbonValue: widthProportion**3 * scale,
-    curveScale: scale,
+    maxCarbonValue: scale,
+    fullSize: fullSize,
   }
 };
+
+const SVG_HEIGHT = 200;
+const SVG_WIDTH = 800;
 
 export class SvgChart extends Component{
   constructor(props){
     super();
     this.state = {
       curveX: 0,
-      curveY: 400,
-      width: 800,
-      height: 400,
-      curveScale: 10, // max value
+      curveY: 200,
+      maxCarbonValue: 10000,
       currentCarbonValue: 0,
+      fullSize: false,
     }
   }
   handleMouseOver = (ev) => {
     const realCoordinates = insideSvgCoordinates(ev);
-    console.log(realCoordinates);
-    let widthProportion = realCoordinates.x / this.state.width;
-    this.setState(updateParams(widthProportion, this.state.curveScale, this.state.width, this.state.height));
+    let widthProportion = realCoordinates.x / SVG_WIDTH;
+    this.setState(updateParams(widthProportion, this.state.maxCarbonValue, true));
   };
 
   handleZoom = (more) => {
@@ -54,33 +55,68 @@ export class SvgChart extends Component{
     });
   };
 
+  handleMouseLeave = () => {
+    console.log('chart mouse leave', this.props.carbonValue, this.state.maxCarbonValue);
+    this.setState(updateParams((this.props.carbonValue / this.state.maxCarbonValue)**(1/3),
+                                this.state.maxCarbonValue, false));
+  };
+
   handleZoomLess = () => {this.handleZoom(false)};
   handleZoomMore = () => {this.handleZoom(true)};
 
+  handleClick = () => {
+    this.setState({
+      fullSize: true,
+      width: 1000,
+      height: 250,
+    });
+  };
+
 
   render(){
-    return <div className="container" style={{width: this.state.width + 'px', height: this.state.height + 'px', margin: 'auto'}}>
-      <svg width={'100%'} height={'100%'} onMouseMove={this.handleMouseOver}>
-        <rect width={'100%'} height={'100%'} fill={'rgba(0,0,0,0.03)'}></rect>
+    let svgPath = ("M0," + SVG_HEIGHT + " c" + SVG_WIDTH / 3 + ",0 " + SVG_WIDTH * 2 / 3 + ",0 " +
+      SVG_WIDTH + ",-" + SVG_HEIGHT);
+
+    let fullsize = this.state.fullSize;
+
+    let divStyle = {
+      // width: '80%',
+      height: fullsize ? '600px' : '',
+      maxWidth: fullsize ? '1000px' : '400px',
+      maxHeight: fullsize ? '600px' : '100px',
+      margin: 'auto', transition: 'width 0.4s ease-in-out, height 0.4s ease-in-out, max-width 0.4s ease-in-out, max-height ease-in-out',
+    };
+
+    let bottomDiv = '';
+
+    if (fullsize){
+      bottomDiv = <div style={{height: '250px'}}>
+        <button className={'button'} onClick={this.handleZoomLess}>Less</button>
+        <button className={'button'} onClick={this.handleZoomMore}>More</button>
+      </div>
+    }
+
+    return <div style={divStyle}
+                className="container" onClick={this.handleClick}>
+      <svg width={'100%'} height={'100%'} viewBox={'0 0 ' + SVG_WIDTH + ' ' +  SVG_HEIGHT}
+           onMouseMove={this.handleMouseOver} id={'svgChart'}
+           onMouseLeave={this.handleMouseLeave}>
+        <rect width={'100%'} height={'100%'} fill={'#fafafa'}/>
         {/*<polygon points={'0,400 800,400, 800,0'} fill={'grey'} stroke={'black'} onMouseOver={this.onMouseOver()} />*/}
-        <path d="M0,400 c266,0 533,0 800,-400" fill="none" strokeWidth="2" stroke="black"/>
-        <path d="M0,400 c266,0 533,0 800,-400 L800,400 z" fill="rgba(0,0,0,0.2)" stroke="none" />
+        <path d={svgPath}
+              fill="none" strokeWidth="2" stroke="black"/>
+        <path d={svgPath + " L800,200 z"} fill="rgba(0,0,0,0.2)" stroke="none" />
         {/* TODO transformation: transition works on the circle (but not line) in Chrome, none of them works in Firefox*/}
         {/*tranform: translate works but is only relative, so this is annoying. Could be enough for when doing zoom though*/}
-        <line x1={this.state.curveX} y1={this.state.height} x2={this.state.curveX} y2={this.state.curveY}
-              stroke={'black'} strokeWidth={4} pointerEvents={'none'}
-              style={{transition: 'x1 0.5s, x2 0.5s, y1 0.5s, y2 0.5s'}}/>
-        <circle r={10} cx={this.state.curveX} cy={this.state.curveY} fill={'black'} pointerEvents={'none'}
-                style={{transition: 'cx 0.1s, cy 0.1s'}}/>
+        <line x1={this.state.curveX} y1={SVG_HEIGHT} x2={this.state.curveX} y2={this.state.curveY}
+              stroke={'black'} strokeWidth={4} pointerEvents={'none'} />
+        <circle r={10} cx={this.state.curveX} cy={this.state.curveY} fill={'black'} pointerEvents={'none'} />
 
 
 
       </svg>
-      <p style={{textAlign: 'center'}}>{this.state.currentCarbonValue}</p>
-      <div>
-        <button className={'button'} onClick={this.handleZoomLess}>Less</button>
-        <button className={'button'} onClick={this.handleZoomMore}>More</button>
-      </div>
+      {/*<p style={{textAlign: 'center'}}>{this.state.currentCarbonValue}</p>*/}
+      {bottomDiv}
     </div>
   }
 }

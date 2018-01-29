@@ -115,7 +115,7 @@ const grammar = (
         {/*</map>*/}
         <Numbers id='number' />
         {/*<Space />*/}
-        <Space />
+        <OptionalSpace />
         <choice limit={5} id="category">
           {/*transport */}
           <sequence argument="transport">

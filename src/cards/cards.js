@@ -12,7 +12,9 @@ const ONE_SLIDER_HEIGHT = 500;
 const SLIDER_START = 65;
 
 const leftDistance = (currentIx) => {
-  return START_LEFT - (currentIx - START_IX) * MOVE_LEFT_EVERY_CARD;
+  let px = -833 - MOVE_LEFT_EVERY_CARD * (currentIx - START_IX);
+  return 'calc(50vw + ' + px + 'px)';
+  // return (START_LEFT - (currentIx - START_IX) * MOVE_LEFT_EVERY_CARD) + 'px';
 };
 
 
@@ -106,13 +108,12 @@ export class Slider extends Component{
 
 class CardsSlider extends Component{
   render(){
-    console.log('cardsSlider render', this.props.cards);
     if (this.props.cards === undefined)
       return null;
     let cards = this.props.cards.map((card, ix) =>
       <Card data={card} central={this.props.currentCardIx === ix} key={ix} handleClick={() => this.props.handleCardClick(ix)}/>);
     return <div className={'sliderWrapper'}>
-      <div className={'cardsWrapper'} style={{left: leftDistance(this.props.currentCardIx) + 'px'}}>
+      <div className={'cardsWrapper'} style={{left: leftDistance(this.props.currentCardIx)}}>
         {cards}
       </div>
     </div>
