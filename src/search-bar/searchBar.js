@@ -10,17 +10,15 @@ export class SearchBar extends Component{
   }
 
   render(){
-    console.log('search bar results', this.props.results);
 
     let proposals = '';
 
     if (this.state.focus){
       let results = this.props.results.slice(0, 5).map((result, ix) => {
-        return <li onClick={() => this.props.handleResult(ix)}>
-          {result.words.map(word => <span style={{color: word.input ? 'black': 'grey'}}>{word.text}</span>)}
+        return <li onClick={() => this.props.handleResult(ix)} key={ix}>
+          {result.words.map((word, ix) => <span key={ix} style={{color: word.input ? 'black': 'grey'}}>{word.text}</span>)}
         </li>
       });
-      console.log('rendered', results);
 
       proposals = <div style={{position: 'absolute', backgroundColor: 'white', top: '38px', left: '3px', right: '3px', paddingLeft: '0.8rem', zIndex: '999999'}}>
         <ul className={'searchBarList'}>

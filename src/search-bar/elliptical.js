@@ -25,12 +25,15 @@ const TransportMeans = {
 };
 
 // creating food, item, transportation items
-let foodItems = [];
-console.log('ITEMS', ITEMS);
-ITEMS['food'].forEach(item => foodItems.push({text: item, value: item}));
-console.log('FOOD ITEMS', foodItems);
-let transportMeansItems = [];
-ITEMS['transport'].forEach(item => transportMeansItems.push({text: item, value: item}));
+let makeItemsList = items => {
+  let toReturn = [];
+  items.forEach(item => toReturn.push({text: item, value: item}));
+  return toReturn
+};
+let foodItems = makeItemsList(ITEMS['food']);
+let transportMeansItems = makeItemsList(ITEMS['transport']);
+let itemsItems = makeItemsList(ITEMS['items']);
+
 
 const FoodItems = {
   describe(){

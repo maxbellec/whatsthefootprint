@@ -41,16 +41,17 @@ export class Slider extends Component{
   handleMoveLeft = () => {this.moveCards(-1)};
   handleMoveLeft5 = () => {this.moveCards(-5)};
 
+
   render(){
     let topButton = '';
     let bottomButton = '';
 
-    if (this.props.topButtonInfo || true) {
+    if (this.props.topButtonInfo) {
       topButton = <button className="button topComparisonButton" onClick={this.handleGoToTop}>
         Compare with {this.props.topButtonInfo.type} - {this.props.topButtonInfo.comparison && this.props.topButtonInfo.comparison.text}
       </button>;
     }
-    if (this.props.bottomButtonInfo || true) {
+    if (this.props.bottomButtonInfo) {
       bottomButton = <button className="button bottomComparisonButton" onClick={this.handleGoToBottom}>
         Compare with {this.props.bottomButtonInfo.type} - {this.props.bottomButtonInfo.comparison && this.props.bottomButtonInfo.comparison.text}
       </button>;
@@ -74,7 +75,8 @@ export class Slider extends Component{
           <button className={'button'} onClick={this.handleMoveLast}>Last</button>
         </div>;
       }
-      let slider = <CardsSlider cards={this.props.cards[type]} currentCardIx={this.props.currentCardIndices[ix]} key={'slider-' + ix}/>;
+      let slider = <CardsSlider cards={this.props.cards[type]} currentCardIx={this.props.currentCardIndices[ix]}
+                                key={'slider-' + ix} handleCardClick={this.props.handleCardClick}/>;
       // let space = ix == 0 ? '' : <div style={{marginTop: '350px'}}></div>;
       let space = '';
       return <div style={{height: '500px'}}>
@@ -103,13 +105,12 @@ export class Slider extends Component{
 }
 
 class CardsSlider extends Component{
-
   render(){
     console.log('cardsSlider render', this.props.cards);
     if (this.props.cards === undefined)
       return null;
     let cards = this.props.cards.map((card, ix) =>
-      <Card data={card} central={this.props.currentCardIx === ix} key={ix}/>);
+      <Card data={card} central={this.props.currentCardIx === ix} key={ix} handleClick={() => this.props.handleCardClick(ix)}/>);
     return <div className={'sliderWrapper'}>
       <div className={'cardsWrapper'} style={{left: leftDistance(this.props.currentCardIx) + 'px'}}>
         {cards}
@@ -171,7 +172,7 @@ class Card extends Component{
         {/*{bottom}*/}
       </div>;
     }
-    return <div className={'card ' + (this.props.central ? 'card-central' : '')}>
+    return <div className={'card ' + (this.props.central ? 'card-central' : '')} onClick={this.props.handleClick}>
       {inside}
     </div>
   }

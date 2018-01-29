@@ -173,6 +173,11 @@ class App extends Component {
 
   updateSearchValue = (newValue) => this.setState({searchValue: newValue});
 
+  handleCardClick = (ix) => {
+    console.log('app card click', ix);
+    this.handleCardsMove(ix - this.currentCardIx());
+  };
+
   render() {
     return (
       <div className="App">
@@ -183,7 +188,8 @@ class App extends Component {
         <Slider currentTypeIx={this.state.currentTypeIx} currentCardIndices={this.state.currentCardIndices}
                 topButtonInfo={this.state.topButtonInfo} bottomButtonInfo={this.state.bottomButtonInfo}
                 cards={this.state.cards} updateComparison={this.updateComparison} handleCardsMove={this.handleCardsMove}
-                handleMoveVertically={this.handleMoveVertically}/>
+                handleMoveVertically={this.handleMoveVertically}
+                handleCardClick={this.handleCardClick}/>
 
       </div>
     );
