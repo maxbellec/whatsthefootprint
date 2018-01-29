@@ -52,10 +52,6 @@ export const foods = {
         'calories_per_kg': 800, // kcal / kg
     }
 };
-export const DATABASE = {
-    'fertilizer': 10, // kg CO2 / kg
-    'pesticide': 1, // kg CO2 / kg
-};
 
 export const getData = () => {
     return [{'label': '1km by car', 'x': 2, 'y': 1.3937960258504656},

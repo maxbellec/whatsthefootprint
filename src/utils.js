@@ -1,4 +1,6 @@
-import {DATABASE, DEFAULTS, food_defaults, foods, ONE_MILLION} from "./data";
+import {DEFAULTS, food_defaults, foods, ONE_MILLION} from "./data";
+import {VERTICAL_ORDER} from "./data/database";
+import {DATABASE} from "./data/database";
 
 export const insideSvgCoordinates = (ev) => {
   let e = ev.target;
@@ -90,4 +92,67 @@ export const formatNumber = (number) => {
       toReturnString.slice(toReturnString.length - 3));
   }
   return toReturnString;
+};
+
+export const findClosestCarbonValue = (value, otherCards) => {
+  // note: if there are a lot of cards, this should be optimized by using a
+  // binary search since cards are sorted
+  let toReturn = {};
+  let closestDistance = Infinity;
+  otherCards.forEach((card, ix) => {
+    let newDistance = Math.abs(card.carbonValue - value);
+    if (newDistance < closestDistance){
+      closestDistance = newDistance;
+      toReturn['text'] = card.nameWithValue;
+      toReturn['ixInType'] = ix;
+    }
+  });
+
+  return toReturn;
+};
+
+const buildCards = dataType => {
+  let unit = '';
+  if (dataType === 'food'){
+    unit = 'kg';
+  }
+  else if (dataType === 'transport'){
+    unit = 'km';
+  }
+  else if (dataType === 'items'){
+    unit = '';
+  }
+  else{
+    throw "expected dataType to be one of (food, transport, ...), was " + dataType;
+  }
+  console.log('buildAllcards, datatype', dataType);
+  let data = DATABASE[dataType];
+
+  let cards = [];
+  data.forEach(foodData => {
+    foodData.possibleValues.forEach(value => {
+      cards.push({
+        name: foodData.name,
+        icon: foodData.icon,
+        value: value,
+        carbonValue: value.value * foodData.carbonIntensity,
+        carbonBreakdown: foodData.carbonBreakdown,
+        nameWithValue: foodData.name + ' (' + formatNumber(value.value) + ' ' + unit + ')',
+      })
+    })
+  });
+
+  // sort cards by carbonValue
+  cards.sort((card, card_other) => card.carbonValue - card_other.carbonValue);
+
+  return cards;
+};
+
+export const buildAllCards = () => {
+  let toReturn = {};
+  VERTICAL_ORDER.forEach(dataType => {
+    toReturn[dataType] = buildCards(dataType)
+  });
+
+  return toReturn
 };

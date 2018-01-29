@@ -1,25 +1,9 @@
 import React, {Component} from "react";
-import './css/cards.css';
-import {CirclePercentageWrapper} from "./widgets/circlePercentage";
-import {DATABASE, QUOTA, QUOTA_PER_CATEGORY, QUOTA_TEXT, VERTICAL_ORDER} from "./data/database";
-import {formatNumber} from "./utils";
-
-const findClosestCarbonValue = (value, otherCards) => {
-  // note: if there are a lot of cards, this should be optimized by using a
-  // binary search since cards are sorted
-  let toReturn = {};
-  let closestDistance = Infinity;
-  otherCards.forEach((card, ix) => {
-    let newDistance = Math.abs(card.carbonValue - value);
-    if (newDistance < closestDistance){
-      closestDistance = newDistance;
-      toReturn['text'] = card.nameWithValue;
-      toReturn['ixInType'] = ix;
-    }
-  });
-
-  return toReturn;
-};
+import './cards.css';
+import {CirclePercentageWrapper} from "../widgets/circlePercentage";
+import {DATABASE, QUOTA, QUOTA_PER_CATEGORY, QUOTA_TEXT, VERTICAL_ORDER} from "../data/database";
+import {formatNumber} from "../utils";
+import {findClosestCarbonValue} from "../utils";
 
 const START_LEFT = 127;
 const START_IX = 2;
@@ -31,149 +15,29 @@ const leftDistance = (currentIx) => {
   return START_LEFT - (currentIx - START_IX) * MOVE_LEFT_EVERY_CARD;
 };
 
-const buildCards = dataType => {
-  let unit = '';
-  if (dataType === 'food'){
-    unit = 'kg';
-  }
-  else if (dataType === 'transport'){
-    unit = 'km';
-  }
-  else if (dataType == 'items'){
-    unit: '';
-  }
-  else{
-    throw "expected dataType to be one of (food, transport, ...), was " + dataType;
-  }
-  let data = DATABASE[dataType];
-
-  let cards = [];
-  data.forEach(foodData => {
-    foodData.possibleValues.forEach(value => {
-      cards.push({
-        name: foodData.name,
-        icon: foodData.icon,
-        value: value,
-        carbonValue: value.value * foodData.carbonIntensity,
-        carbonBreakdown: foodData.carbonBreakdown,
-        nameWithValue: foodData.name + ' (' + formatNumber(value.value) + ' ' + unit + ')',
-      })
-    })
-  });
-
-  // sort cards by carbonValue
-  cards.sort((card, card_other) => card.carbonValue - card_other.carbonValue);
-
-  return cards;
-};
-
-const buildAllCards = () => {
-  let toReturn = {};
-  VERTICAL_ORDER.forEach(dataType => {
-    toReturn[dataType] = buildCards(dataType)
-  });
-
-  return toReturn
-};
-
 
 export class Slider extends Component{
-  constructor(){
-    super();
-    this.cards = buildAllCards();
-    this.state = {
-      currentCardIndices: VERTICAL_ORDER.map(type => type === 'food' ? 2 : 0),
-      topButtonInfo: '',
-      bottomButtonInfo: '',
-      currentTypeIx: 1,
-    };
-  }
-
   componentDidMount = () => {
-    this.updateComparison();
+    this.props.updateComparison();
   };
 
-  currentType = () => VERTICAL_ORDER[this.state.currentTypeIx];
-  currentCardIx = () => this.state.currentCardIndices[this.state.currentTypeIx];
+  currentType = () => VERTICAL_ORDER[this.props.currentTypeIx];
+  currentCardIx = () => this.props.currentCardIndices[this.props.currentTypeIx];
 
-  updateComparison = () => {
-    console.log('update comparison');
-    // get current carbon value
-    let currentCarbonValue = this.cards[this.currentType()][this.currentCardIx()].carbonValue;
-    // get top and bottom cards
-    let currentVerticalIx = this.state.currentTypeIx;
-
-    let newCardIndices = Object.assign({}, this.state.currentCardIndices);
-
-    // for all other types, we update the index to the index whose carbon value
-    // is the closest to the current one
-    VERTICAL_ORDER.forEach((type, ix) => {
-      if (ix === this.state.currentTypeIx){
-        return
-      }
-      let res = findClosestCarbonValue(currentCarbonValue, this.cards[type]);
-      newCardIndices[ix] = res['ixInType'];
-    });
-
-    let topInfo = '';
-    let bottomInfo = '';
-    if (currentVerticalIx > 0){
-      topInfo = {
-        comparison: findClosestCarbonValue(currentCarbonValue, this.cards[VERTICAL_ORDER[currentVerticalIx - 1]]),
-        type: VERTICAL_ORDER[currentVerticalIx - 1],
-      };
-    }
-    if (currentVerticalIx < VERTICAL_ORDER.length - 1){
-      bottomInfo = {
-        comparison: findClosestCarbonValue(currentCarbonValue, this.cards[VERTICAL_ORDER[currentVerticalIx + 1]]),
-        type: VERTICAL_ORDER[currentVerticalIx + 1],
-      };
-    }
-
-    this.setState({
-      topButtonInfo: topInfo,
-      bottomButtonInfo: bottomInfo,
-      currentCardIndices: newCardIndices,
-    });
-  };
-
-  handleCardsMove = (increment) => {
-    console.log('handle cards move', this.currentCardIx(), increment);
-    this.setState((prevState) => {
-      let newCardIndices = Object.assign({}, prevState.currentCardIndices);
-      newCardIndices[prevState.currentTypeIx] += increment;
-      return {currentCardIndices: newCardIndices};
-    }, this.updateComparison);
-  };
-
-  handleMoveVertically = top => {
-    console.log('currentTypeIx', this.state.currentTypeIx, 'VERTICAL_ORDER', VERTICAL_ORDER);
-    let newIx = this.state.currentTypeIx + 1 - 2 * top;
-
-    if ((newIx > VERTICAL_ORDER.length - 1) || (newIx < 0)){
-      // throw 'Problem with currentTypeIx';
-      return
-    }
-
-    this.setState({
-      currentTypeIx: newIx,
-    }, this.updateComparison);
-  };
-
-  handleGoToTop = () => {this.handleMoveVertically(true)};
-  handleGoToBottom = () => {this.handleMoveVertically(false)};
+  handleGoToTop = () => {this.props.handleMoveVertically(true)};
+  handleGoToBottom = () => {this.props.handleMoveVertically(false)};
 
   moveCards = (increment) => {
     // make sure we don't move further than 0 or max
     increment = Math.max(-this.currentCardIx(), increment);
-    increment = Math.min((this.cards[this.currentType()].length - this.currentCardIx() - 1), increment);
-    this.handleCardsMove(increment);
+    increment = Math.min((this.props.cards[this.currentType()].length - this.currentCardIx() - 1), increment);
+    this.props.handleCardsMove(increment);
   };
 
   handleMoveRight = () => {this.moveCards(1)};
   handleMoveRight5 = () => {this.moveCards(5)};
   handleMoveFirst = () => {this.moveCards(-this.currentCardIx())};
-  handleMoveLast = () => {this.moveCards(this.cards[this.currentType()].length - this.currentCardIx()- 1)};
+  handleMoveLast = () => {this.moveCards(this.props.cards[this.currentType()].length - this.currentCardIx()- 1)};
   handleMoveLeft = () => {this.moveCards(-1)};
   handleMoveLeft5 = () => {this.moveCards(-5)};
 
@@ -181,14 +45,14 @@ export class Slider extends Component{
     let topButton = '';
     let bottomButton = '';
 
-    if (this.state.topButtonInfo || true) {
+    if (this.props.topButtonInfo || true) {
       topButton = <button className="button topComparisonButton" onClick={this.handleGoToTop}>
-        Compare with {this.state.topButtonInfo.type} - {this.state.topButtonInfo.comparison && this.state.topButtonInfo.comparison.text}
+        Compare with {this.props.topButtonInfo.type} - {this.props.topButtonInfo.comparison && this.props.topButtonInfo.comparison.text}
       </button>;
     }
-    if (this.state.bottomButtonInfo || true) {
+    if (this.props.bottomButtonInfo || true) {
       bottomButton = <button className="button bottomComparisonButton" onClick={this.handleGoToBottom}>
-        Compare with {this.state.bottomButtonInfo.type} - {this.state.bottomButtonInfo.comparison && this.state.bottomButtonInfo.comparison.text}
+        Compare with {this.props.bottomButtonInfo.type} - {this.props.bottomButtonInfo.comparison && this.props.bottomButtonInfo.comparison.text}
       </button>;
     }
 
@@ -198,7 +62,7 @@ export class Slider extends Component{
 
       let navButtons = '';
 
-      if (ix === this.state.currentTypeIx){
+      if (ix === this.props.currentTypeIx){
         handleMove = this.handleCardsMove;
 
         navButtons = <div style={{textAlign: 'center'}}>
@@ -210,7 +74,7 @@ export class Slider extends Component{
           <button className={'button'} onClick={this.handleMoveLast}>Last</button>
         </div>;
       }
-      let slider = <CardsSlider cards={this.cards[type]} currentCardIx={this.state.currentCardIndices[ix]} key={'slider-' + ix}/>;
+      let slider = <CardsSlider cards={this.props.cards[type]} currentCardIx={this.props.currentCardIndices[ix]} key={'slider-' + ix}/>;
       // let space = ix == 0 ? '' : <div style={{marginTop: '350px'}}></div>;
       let space = '';
       return <div style={{height: '500px'}}>
@@ -230,7 +94,7 @@ export class Slider extends Component{
 
     return <div className={'SliderBigWrapper'}>
       {/*{navigation}*/}
-      <div className={'SlidersContainer'} style={{top: (-this.state.currentTypeIx * ONE_SLIDER_HEIGHT + SLIDER_START)+ 'px'}}>
+      <div className={'SlidersContainer'} style={{top: (-this.props.currentTypeIx * ONE_SLIDER_HEIGHT + SLIDER_START)+ 'px'}}>
         {sliders}
       </div>
       {navigation}
