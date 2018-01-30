@@ -173,7 +173,8 @@ class Card extends Component{
         {/*{bottom}*/}
       </div>;
     }
-    return <div className={'card ' + (this.props.central ? 'card-central' : '')} onClick={this.props.handleClick}>
+    return <div className={'card ' + (this.props.central ? 'card-central' : '')}
+                onClick={this.props.handleClick} style={{cursor: 'pointer'}}>
       {inside}
     </div>
   }
