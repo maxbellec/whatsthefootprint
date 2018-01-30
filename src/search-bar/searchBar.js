@@ -33,7 +33,7 @@ export class SearchBar extends Component{
     return <div className={'search-bar'} style={{margin: 'auto', width: '40%', maxWidth: '500px', marginTop: '20px', marginBottom: '10px', position: 'relative'}}>
       <input type="text" style={{fontSize: '1.5rem', width: '100%', borderBottomRightRadius: borderRadius, borderBottomLeftRadius: borderRadius}}
              value={this.props.searchValue} id={'searchInput'}
-             placeholder="e.g. 20 kg of Tomato" onChange={this.props.handleChange}
+             placeholder="20 kg of Tomato" onChange={this.props.handleChange}
              onKeyUp={event => {if (event.key === 'Enter') return this.props.handleResult(0);}}
              onFocus={() => this.setState({focus: true})}
              onBlur={() => this.setState({focus: false})}/>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './css/App.css';
 import {SvgChart} from './charts';
 import {Slider} from './cards/cards';
-import {buildAllCards, cardFromData, findClosestCarbonValue, resultsForFood, UNIT_FROM_VERTICAL} from "./utils";
+import {buildAllCards, cardFromData, findClosestCarbonValue, UNIT_FROM_VERTICAL} from "./utils";
 import {Header} from "./header";
 import {DATABASE, VERTICAL_ORDER} from "./data/database";
 import {parse} from "./search-bar/elliptical";
@@ -68,7 +68,7 @@ class App extends Component {
         console.log('inserting card');
         var cards = Object.assign({}, this.state.cards);
         let data = {};
-        DATABASE[dataType].forEach((card, ix) => {
+        DATABASE[dataType].forEach((card) => {
           if (card.name === item)
             data = Object.assign({}, card);
         });
@@ -78,8 +78,9 @@ class App extends Component {
 
         // search where to insert the card
         cards[dataType].forEach((card, ix) => {
-          if (card.value.value < number)
+          if (card.carbonValue < number) {
             cardIx = ix + 1;
+          }
         });
 
         console.log('card to insert', newCard, 'at position', cardIx);

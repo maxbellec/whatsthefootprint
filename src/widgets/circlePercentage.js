@@ -1,13 +1,12 @@
 import React, {Component} from "react";
 import './circlePercentage.css';
-import {QUOTA, QUOTA_PER_CATEGORY} from "../data/database";
 
 export class CirclePercentage extends Component{
     constructor(props){
         super();
         // width, strokeWidth, percentage
-        this.percentage = Math.round(props.percentage);
-        this.textPercentage = this.percentage;
+        this.percentage = props.percentage === '∞' ? 110 : props.percentage;
+        this.textPercentage = typeof props.percentage === 'number' ? (Math.round(props.percentage) + '%') : props.percentage;
         this.circlePercentage = Math.min(this.percentage, 100);
         this.state = {
             percentage: 0,
@@ -21,11 +20,11 @@ export class CirclePercentage extends Component{
     render(){
         // source: https://www.cssscript.com/pure-css-circular-percentage-bar/
         return <div style={{width: this.props.size, height: this.props.size, display: 'inline-block'}}>
-            <div className={'c100' + (this.props.percentage > 50 ? ' p' : '')} style={{fontSize: this.props.size}}>
-                <span>{this.textPercentage}%</span>
+            <div className={'c100' + (this.percentage > 50 ? ' p' : '')} style={{fontSize: this.props.size}}>
+                <span>{this.textPercentage}</span>
                 <div className={'slice'}>
-                    <div className={'bar'} style={{transform: 'rotate(' + this.state.percentage / 100 * 360 + 'deg)'}}></div>
-                    <div className={'fill'}></div>
+                    <div className={'bar'} style={{transform: 'rotate(' + this.state.percentage / 100 * 360 + 'deg)'}}/>
+                    <div className={'fill'}/>
                 </div>
             </div>
         </div>;

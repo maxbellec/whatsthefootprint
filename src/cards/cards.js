@@ -1,11 +1,12 @@
 import React, {Component} from "react";
 import './cards.css';
 import {CirclePercentageWrapper} from "../widgets/circlePercentage";
-import {DATABASE, QUOTA, QUOTA_PER_CATEGORY, QUOTA_TEXT, VERTICAL_ORDER} from "../data/database";
+import {
+  DAILY_PER_CAPITA_CARBON_ALLOWANCE, MONTHLY_PER_CAPITA_CARBON_ALLOWANCE, QUOTA_PER_CATEGORY,
+  VERTICAL_ORDER, YEARLY_PER_CAPITA_CARBON_ALLOWANCE
+} from "../data/database";
 import {formatNumber} from "../utils";
-import {findClosestCarbonValue} from "../utils";
 
-const START_LEFT = 127;
 const START_IX = 2;
 const MOVE_LEFT_EVERY_CARD = 272;
 const ONE_SLIDER_HEIGHT = 500;
@@ -14,7 +15,6 @@ const SLIDER_START = 65;
 const leftDistance = (currentIx) => {
   let px = -833 - MOVE_LEFT_EVERY_CARD * (currentIx - START_IX);
   return 'calc(50vw + ' + px + 'px)';
-  // return (START_LEFT - (currentIx - START_IX) * MOVE_LEFT_EVERY_CARD) + 'px';
 };
 
 
@@ -37,11 +37,7 @@ export class Slider extends Component{
   };
 
   handleMoveRight = () => {this.moveCards(1)};
-  handleMoveRight5 = () => {this.moveCards(5)};
-  handleMoveFirst = () => {this.moveCards(-this.currentCardIx())};
-  handleMoveLast = () => {this.moveCards(this.props.cards[this.currentType()].length - this.currentCardIx()- 1)};
   handleMoveLeft = () => {this.moveCards(-1)};
-  handleMoveLeft5 = () => {this.moveCards(-5)};
 
 
   render(){
@@ -60,32 +56,11 @@ export class Slider extends Component{
     }
 
     let sliders = VERTICAL_ORDER.map((type, ix) => {
-      let handleMove = null;
-      // buttons
-
-      let navButtons = '';
-
-      if (ix === this.props.currentTypeIx){
-        handleMove = this.handleCardsMove;
-
-        navButtons = <div style={{textAlign: 'center'}}>
-          <button className={'button'} onClick={this.handleMoveFirst}>First</button>
-          <button className={'button'} onClick={this.handleMoveLeft5}>Previous 5</button>
-          <button className={'button'} onClick={this.handleMoveLeft}>Previous</button>
-          <button className={'button'} onClick={this.handleMoveRight}>Next</button>
-          <button className={'button'} onClick={this.handleMoveRight5}>Next 5</button>
-          <button className={'button'} onClick={this.handleMoveLast}>Last</button>
-        </div>;
-      }
       let slider = <CardsSlider cards={this.props.cards[type]} currentCardIx={this.props.currentCardIndices[ix]}
                                 key={'slider-' + ix} handleCardClick={this.props.handleCardClick}/>;
       // let space = ix == 0 ? '' : <div style={{marginTop: '350px'}}></div>;
-      let space = '';
       return <div style={{height: '500px'}}>
-        {/*{topButton}*/}
-        {/*{navButtons}*/}
         {slider}
-        {/*{bottomButton}*/}
       </div>;
     });
 
@@ -97,7 +72,6 @@ export class Slider extends Component{
     </div>;
 
     return <div className={'SliderBigWrapper'}>
-      {/*{navigation}*/}
       <div className={'SlidersContainer'} style={{top: (-this.props.currentTypeIx * ONE_SLIDER_HEIGHT + SLIDER_START)+ 'px'}}>
         {sliders}
       </div>
@@ -125,20 +99,12 @@ class Card extends Component{
     let inside = '';
 
     if (this.props.central){
-      if (QUOTA[this.props.data.value.comparisonSize] === undefined)
-        console.warn('QUOTA undefined', this.props.data.value.comparisonSize);
-
-      let quota = QUOTA[this.props.data.value.comparisonSize][this.props.data.value.comparisonTime];
-      let foodQuota = QUOTA_PER_CATEGORY['food'] * quota;
-
-      let percentageText = QUOTA_TEXT[this.props.data.value.comparisonSize][this.props.data.value.comparisonTime];
-      if (percentageText === undefined)
-        console.warn('percentage text undefined', this.props.data.value.comparisonSize, this.props.data.value.comparisonTime);
-      let firstPercentageText = percentageText.replace('%TYPE%', '');
-      let secondPercentageText = percentageText.replace('%TYPE%', 'food');
-
-      let firstPercentage = 100 * this.props.data.carbonValue / quota;
-      let secondPercentage = 100 * this.props.data.carbonValue / foodQuota;
+      let percentages = [
+        100 * this.props.data.carbonValue / DAILY_PER_CAPITA_CARBON_ALLOWANCE,
+        100 * this.props.data.carbonValue / MONTHLY_PER_CAPITA_CARBON_ALLOWANCE,
+        100 * this.props.data.carbonValue / YEARLY_PER_CAPITA_CARBON_ALLOWANCE
+      ];
+      percentages = percentages.map(n => (n > 999) ? '∞' : n);
 
       let valueName = this.props.data.value.name;
       if (!valueName)
@@ -153,9 +119,14 @@ class Card extends Component{
         <h6>{formatNumber(this.props.data.carbonValue)} kg CO2 eq</h6>
 
         {/*bottom stat*/}
-        <div><CirclePercentageWrapper width={100} strokeWidth={3} percentage={firstPercentage} text={firstPercentageText}/>
-          <div style={{display: 'inline-block', width: '40px'}}></div>
-          <CirclePercentageWrapper width={100} strokeWidth={3} percentage={secondPercentage} text={secondPercentageText}/></div>
+        <div>
+          <CirclePercentageWrapper width={100} strokeWidth={3} percentage={percentages[0]} text={'daily carbon allowance'}/>
+          <div style={{display: 'inline-block', width: '40px'}}/>
+          <CirclePercentageWrapper width={100} strokeWidth={3} percentage={percentages[1]} text={'monthly carbon allowance'}/>
+          <div style={{display: 'inline-block', width: '40px'}}/>
+          <CirclePercentageWrapper width={100} strokeWidth={3} percentage={percentages[2]} text={'yearly carbon allowance'}/>
+        </div>
+
 
       </div>;
     }

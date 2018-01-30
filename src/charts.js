@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {insideSvgCoordinates, colorFromIntensity, findClosestCarbonValue, formatNumber} from './utils'
 import {getData} from "./data";
 import {VictoryBar, VictoryChart, VictoryTooltip} from 'victory';
-import {MAX_ALLOWANCE_PER_CAPITA, VERTICAL_ORDER} from "./data/database";
+import {VERTICAL_ORDER, YEARLY_PER_CAPITA_CARBON_ALLOWANCE} from "./data/database";
 
 const afterZoomParams = (prevState, coeff) => {
   // the scale gets bigger, so the x index is lower. The currentCarbonValue,
@@ -42,9 +42,6 @@ export class SvgChart extends Component{
     }
     this.setState(this.updateParams(widthProportion, this.state.maxCarbonValue));
   };
-  handleMouseEnters = ev => {
-    console.log('handle mouse enters');
-  };
 
   updateParams = (widthProportion, scale) => {
     let currentCarbonValue = widthProportion**3 * scale;
@@ -69,22 +66,22 @@ export class SvgChart extends Component{
 
   /* functions to change scale, not used at the moment. Could be used with a button such as */
   /* <button className={'button'} onClick={this.handleZoomLess}>Zoom out</button> */
-  handleZoom = (more) => {
-    console.log('zoom, ', more);
-    const coeff = more ? 2 : 1/2;
-    this.setState((prevState, props) => {
-      console.log('prevstate', prevState);
-      return afterZoomParams(prevState, coeff);
-    });
-  };
-  handleZoomLess = () => {this.handleZoom(false)};
-  handleZoomMore = () => {this.handleZoom(true)};
+  // handleZoom = (more) => {
+  //   console.log('zoom, ', more);
+  //   const coeff = more ? 2 : 1/2;
+  //   this.setState((prevState) => {
+  //     console.log('prevstate', prevState);
+  //     return afterZoomParams(prevState, coeff);
+  //   });
+  // };
+  // handleZoomLess = () => {this.handleZoom(false)};
+  // handleZoomMore = () => {this.handleZoom(true)};
 
   handleMouseLeave = () => {
     if (!this.state.fullSize || true)
       return;
     console.log('chart mouse leave', this.props.carbonValue, this.state.maxCarbonValue);
-    this.setState(prevState => this.updateParams((this.props.carbonValue / this.state.maxCarbonValue)**(1/3),
+    this.setState(this.updateParams((this.props.carbonValue / this.state.maxCarbonValue)**(1/3),
                                 this.state.maxCarbonValue));
   };
 
@@ -135,8 +132,11 @@ export class SvgChart extends Component{
     let closeItems = [];
     if (fullsize){
       for (let dataType in this.state.closeItems){
-        let card = this.state.closeItems[dataType];
-        closeItems.push(<li key={dataType} style={{cursor: 'pointer'}} onClick={() => this.handleItemClick(dataType, card.ixInType)}><img style={{width: '30px'}} src={'img/emojis/' + card.card.icon} alt={card.text}/>{card.text}</li>)
+        if (this.state.closeItems.hasOwnProperty(dataType)){
+          let card = this.state.closeItems[dataType];
+          closeItems.push(<li key={dataType} style={{cursor: 'pointer'}} onClick={() => this.handleItemClick(dataType, card.ixInType)}><img style={{width: '30px'}} src={'img/emojis/' + card.card.icon} alt={card.text}/>{card.text}</li>)
+        }
+
       }
       bottomDiv = <div style={{height: '250px', cursor: 'default'}}>
         <ul style={{marginLeft: (this.state.curveX / SVG_WIDTH * 1000 - 150) + 'px',
@@ -152,7 +152,7 @@ export class SvgChart extends Component{
     let maxLine = '';
     let maxText = '';
     if (this.state.fullSize){
-      let maxAllowanceHeight = SVG_HEIGHT * (1 - MAX_ALLOWANCE_PER_CAPITA / this.state.maxCarbonValue);
+      let maxAllowanceHeight = SVG_HEIGHT * (1 - YEARLY_PER_CAPITA_CARBON_ALLOWANCE / this.state.maxCarbonValue);
       maxLine = <line x1={0} x2={SVG_WIDTH} y1={maxAllowanceHeight} y2={maxAllowanceHeight} strokeWidth={1} stroke={'red'}/>;
       maxText = <text x={5} y={maxAllowanceHeight - 5} fontSize={8} fill={'red'}>max yearly carbon allowance per capita</text>;
     }
@@ -162,7 +162,6 @@ export class SvgChart extends Component{
       <img src="/img/close.svg" alt="close" onClick={this.handleClose} style={{position: 'absolute', right: '3%', top: '-2vw', maxWidth: '60px', width: fullsize ? '6vw' : '0', transition: 'width 0.4s ease-in-out'}}/>
       <svg width={'100%'} viewBox={'0 0 ' + SVG_WIDTH + ' ' +  SVG_HEIGHT}
            onMouseMove={this.handleMouseOver} id={'svgChart'}
-           onMouseEnter={this.handleMouseEnters}
            onMouseLeave={this.handleMouseLeave}>
         <rect width={'100%'} height={'100%'} fill={'#fafafa'}/>
         <path d={svgPath}
@@ -177,77 +176,5 @@ export class SvgChart extends Component{
       {/*<p style={{textAlign: 'center'}}>{this.state.currentCarbonValue}</p>*/}
       {bottomDiv}
     </div>
-  }
-}
-
-class Chart extends Component{
-  constructor(props){
-    super(props);
-    this.state = {data: []};
-  }
-
-  componentDidMount(){
-    let data = getData();
-    // for (let i = 0; i < data.length; i++){
-    //     setTimeout(() => {this.setState({data: data.slice(0, i + 1)})}, i * 10);
-    // }
-    this.setState({data: data});
-    console.log('change data');
-  }
-
-  render(){
-    return <VictoryChart
-      domain={{ x: [0, 200], y: [0, 90] }}
-      // animate={{duration: 3}}
-    >
-      <VictoryBar
-        labelComponent={
-          <VictoryTooltip
-            cornerRadius={(d) => 10}
-            pointerLength={(d) => 20}
-            flyoutStyle={{stroke: (d) => 'black'}}
-          />
-        }
-        events={[
-          {
-            target: "data",
-            eventHandlers: {
-              onMouseEnter: () => {
-                return [{
-                  target: "labels",
-                  mutation: (props) => {
-                    console.log('label props', props);
-                    this.props.onMouseEnter(props.text);
-                    return props.text === "clicked" ?
-                      null : { text: "clicked" }
-                  }
-                },
-                  {
-                    target: 'data',
-                    mutation: (props) => {
-                      console.log('data props', props);
-
-                      return {'style': Object.assign(props.style, {'filter': 'grayscale(0%)'})}
-                    }
-                  }];
-              },
-              onMouseLeave: () => {
-                return [{
-                  target: 'data',
-                  mutation: (props) => {
-                    return {'style': Object.assign(props.style, {'filter': 'grayscale(100%)'})}
-                  }
-                }]
-              }
-            }
-          },
-
-        ]}
-        data={this.state.data}
-        style={{
-          data: {fill: d => colorFromIntensity(d.y), width: 10, filter: 'grayscale(100%)'}
-        }}
-      />
-    </VictoryChart>
   }
 }

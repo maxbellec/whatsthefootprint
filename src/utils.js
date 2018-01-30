@@ -10,12 +10,6 @@ export const insideSvgCoordinates = (ev) => {
   pt.y = ev.clientY;
   let svgGlobal = pt.matrixTransform(demo.getScreenCTM().inverse());
   return {x: svgGlobal.x, y: svgGlobal.y};
-  // svgGlobal.x and svgGlobal.y are now in SVG coordinates
-  let e = ev.target;
-  let dim = e.getBoundingClientRect();
-  let x = ev.clientX - dim.left;
-  let y = ev.clientY - dim.top;
-  return {x: x, y: y};
 };
 
 export const colorFromIntensity = (intensity) => {
