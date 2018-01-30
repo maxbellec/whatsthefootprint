@@ -87,19 +87,29 @@ class App extends Component {
         cards[dataType].splice(cardIx, 0, newCard);
       }
 
-      let newCardIndices = Object.assign([], this.state.currentCardIndices);
-      newCardIndices[newVerticalIx] = cardIx;
+      // let newCardIndices = Object.assign([], this.state.currentCardIndices);
+      // newCardIndices[newVerticalIx] = cardIx;
       document.getElementById('searchInput').blur();
       let newState = {
-        currentTypeIx: newVerticalIx,
-        currentCardIndices: newCardIndices,
+        // currentTypeIx: newVerticalIx,
+        // currentCardIndices: newCardIndices,
         searchValue: '',
         searchResults: parse(''),
       };
       if (isInsertingCard)
         newState['cards'] = cards;
       this.setState(newState, this.updateComparison);
+      this.moveToPosition(newVerticalIx, cardIx);
     }
+  };
+
+  moveToPosition = (verticalIx, cardIx) => {
+    let newCardIndices = Object.assign([], this.state.currentCardIndices);
+    newCardIndices[verticalIx] = cardIx;
+    this.setState({
+      currentTypeIx: verticalIx,
+      currentCardIndices: newCardIndices,
+    });
   };
 
   // current vertical
@@ -158,9 +168,9 @@ class App extends Component {
     }, this.updateComparison);
   };
 
-  handleMoveVertically = top => {
+  handleMoveVertically = increment => {
     console.log('currentTypeIx', this.state.currentTypeIx, 'VERTICAL_ORDER', VERTICAL_ORDER);
-    let newIx = this.state.currentTypeIx + 1 - 2 * top;
+    let newIx = this.state.currentTypeIx + increment;
 
     if ((newIx > VERTICAL_ORDER.length - 1) || (newIx < 0)){
       // throw 'Problem with currentTypeIx';
@@ -185,7 +195,8 @@ class App extends Component {
         <Header handleSearchResult={this.handleSearchResult} searchValue={this.state.searchValue}
                 updateSearchValue={this.updateSearchValue} searchResults={this.state.searchResults}
                 handleSearchChange={this.handleSearchChange}/>
-        <SvgChart carbonValue={this.currentCard().carbonValue}/>
+        <SvgChart carbonValue={this.currentCard().carbonValue} cards={this.state.cards}
+                  moveToPosition={this.moveToPosition}/>
         {/*<SvgChart />*/}
         <Slider currentTypeIx={this.state.currentTypeIx} currentCardIndices={this.state.currentCardIndices}
                 topButtonInfo={this.state.topButtonInfo} bottomButtonInfo={this.state.bottomButtonInfo}

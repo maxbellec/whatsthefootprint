@@ -26,8 +26,8 @@ export class Slider extends Component{
   currentType = () => VERTICAL_ORDER[this.props.currentTypeIx];
   currentCardIx = () => this.props.currentCardIndices[this.props.currentTypeIx];
 
-  handleGoToTop = () => {this.props.handleMoveVertically(true)};
-  handleGoToBottom = () => {this.props.handleMoveVertically(false)};
+  handleGoToTop = () => {this.props.handleMoveVertically(-1)};
+  handleGoToBottom = () => {this.props.handleMoveVertically(1)};
 
   moveCards = (increment) => {
     // make sure we don't move further than 0 or max

@@ -30,13 +30,13 @@
 }
 .rightArrow{
     top: 220px;
-    left: 1215px;
+    left: calc(50vw + 255px);;
     width: 80px;
     position: absolute;
 }
 .leftArrow{
     top: 220px;
-    left: 630px;
+    left: calc(50vw - 330px);
     width: 80px;
     position: absolute;
     transform-origin: 50% 50%;

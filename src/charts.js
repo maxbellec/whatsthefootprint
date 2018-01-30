@@ -1,7 +1,8 @@
 import React, {Component} from "react";
-import {insideSvgCoordinates, colorFromIntensity} from './utils'
+import {insideSvgCoordinates, colorFromIntensity, findClosestCarbonValue, formatNumber} from './utils'
 import {getData} from "./data";
 import {VictoryBar, VictoryChart, VictoryTooltip} from 'victory';
+import {VERTICAL_ORDER} from "./data/database";
 
 const afterZoomParams = (prevState, coeff) => {
   // the scale gets bigger, so the x index is lower. The currentCarbonValue,
@@ -13,19 +14,7 @@ const afterZoomParams = (prevState, coeff) => {
     curveX: newWidthProportion * SVG_WIDTH,
     curveY: (1 - newWidthProportion**3) * SVG_HEIGHT,
     maxCarbonValue: coeff * prevState.maxCarbonValue,
-  }
-};
-
-const updateParams = (widthProportion, scale, fullSize) => {
-  console.log('updateParasm, fullsize', fullSize);
-  if (fullSize === undefined)
-    fullSize = this.state.fullSize;
-  return {
-    curveY: (1 - widthProportion**3) * SVG_HEIGHT,
-    curveX: widthProportion * SVG_WIDTH,
-    currentCarbonValue: widthProportion**3 * scale,
-    maxCarbonValue: scale,
-    fullSize: fullSize,
+    closeItems: {},
   }
 };
 
@@ -46,9 +35,35 @@ export class SvgChart extends Component{
   handleMouseOver = (ev) => {
     if (!this.state.fullSize)
       return;
-    const realCoordinates = insideSvgCoordinates(ev);
-    let widthProportion = realCoordinates.x / SVG_WIDTH;
-    this.setState(updateParams(widthProportion, this.state.maxCarbonValue, true));
+    let widthProportion = 0.5;
+    if (ev !== undefined){
+      let realCoordinates = insideSvgCoordinates(ev);
+      widthProportion = realCoordinates.x / SVG_WIDTH;
+    }
+    this.setState(this.updateParams(widthProportion, this.state.maxCarbonValue));
+  };
+  handleMouseEnters = ev => {
+    console.log('handle mouse enters');
+  };
+
+  updateParams = (widthProportion, scale) => {
+    let currentCarbonValue = widthProportion**3 * scale;
+    let closeItems = {};
+
+    if (this.state.fullSize){
+      // find the closest cards for this value
+      VERTICAL_ORDER.forEach(dataType => {
+        closeItems[dataType] = findClosestCarbonValue(currentCarbonValue, this.props.cards[dataType]);
+      });
+    }
+
+    return {
+      curveY: (1 - widthProportion**3) * SVG_HEIGHT,
+      curveX: widthProportion * SVG_WIDTH,
+      currentCarbonValue: currentCarbonValue,
+      maxCarbonValue: scale,
+      closeItems: closeItems,
+    }
   };
 
 
@@ -66,26 +81,35 @@ export class SvgChart extends Component{
   handleZoomMore = () => {this.handleZoom(true)};
 
   handleMouseLeave = () => {
+    if (!this.state.fullSize || true)
+      return;
     console.log('chart mouse leave', this.props.carbonValue, this.state.maxCarbonValue);
-    this.setState(prevState => updateParams((this.props.carbonValue / this.state.maxCarbonValue)**(1/3),
-                                this.state.maxCarbonValue, prevState.fullSize));
+    this.setState(prevState => this.updateParams((this.props.carbonValue / this.state.maxCarbonValue)**(1/3),
+                                this.state.maxCarbonValue));
   };
 
 
 
   handleClick = () => {
     console.log('click on chart');
-    this.setState({
-      fullSize: true,
-      width: 1000,
-      height: 250,
-    });
+    if (!this.state.fullSize)
+      this.setState({
+        fullSize: true,
+        width: 1000,
+        height: 250,
+      }, this.handleMouseOver);
   };
 
   handleClose = (ev) => {
-    ev.stopPropagation();
+    if (ev)
+      ev.stopPropagation();
     console.log('close');
     this.setState({fullSize: false});
+  };
+
+  handleItemClick = (dataType, ixInType) => {
+    this.props.moveToPosition(VERTICAL_ORDER.indexOf(dataType), ixInType);
+    this.handleClose();
   };
 
 
@@ -108,10 +132,19 @@ export class SvgChart extends Component{
     };
 
     let bottomDiv = '';
-
+    let closeItems = [];
     if (fullsize){
-      bottomDiv = <div style={{height: '250px'}}>
-
+      for (let dataType in this.state.closeItems){
+        let card = this.state.closeItems[dataType];
+        closeItems.push(<li style={{cursor: 'pointer'}} onClick={() => this.handleItemClick(dataType, card.ixInType)}><img style={{width: '30px'}} src={'img/emojis/' + card.card.icon} alt={card.text}/>{card.text}</li>)
+      }
+      bottomDiv = <div style={{height: '250px', cursor: 'default'}}>
+        <ul style={{marginLeft: (this.state.curveX / SVG_WIDTH * 1000 - 150) + 'px',
+                    listStyleType: 'none', textAlign: 'center', width: '300px'}}>
+          <h3 style={{fontSize: '2.7rem', marginBottom: 0}}>{formatNumber(this.state.currentCarbonValue)} kg CO2-eq</h3>
+          <h3 style={{fontSize: '2.3rem', marginBottom: 0}}>items with similar footprint</h3>
+          {closeItems}
+        </ul>
       </div>
     }
 
@@ -120,6 +153,7 @@ export class SvgChart extends Component{
       <img src="/img/close.svg" alt="close" onClick={this.handleClose} style={{position: 'absolute', right: '3%', top: '-2vw', maxWidth: '60px', width: fullsize ? '6vw' : '0', transition: 'width 0.4s ease-in-out'}}/>
       <svg width={'100%'} viewBox={'0 0 ' + SVG_WIDTH + ' ' +  SVG_HEIGHT}
            onMouseMove={this.handleMouseOver} id={'svgChart'}
+           onMouseEnter={this.handleMouseEnters}
            onMouseLeave={this.handleMouseLeave}>
         <rect width={'100%'} height={'100%'} fill={'#fafafa'}/>
         <path d={svgPath}

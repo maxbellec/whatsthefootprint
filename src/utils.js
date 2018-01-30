@@ -113,6 +113,7 @@ export const findClosestCarbonValue = (value, otherCards) => {
       closestDistance = newDistance;
       toReturn['text'] = card.nameWithValue;
       toReturn['ixInType'] = ix;
+      toReturn['card'] = card;
     }
   });
 
