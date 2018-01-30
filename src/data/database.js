@@ -3,6 +3,7 @@ const YEARLY_PER_CAPITA_CARBON_ALLOWANCE = 2000;
 const CITY_SIZE = ONE_MILLION / 10;
 const COUNTRY_SIZE = 70 * ONE_MILLION;
 const WORLD_SIZE = 7550 * ONE_MILLION;
+export const MAX_ALLOWANCE_PER_CAPITA = 2000;  // max 2t per person per year
 
 export const QUOTA = {
   'personal': {

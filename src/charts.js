@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {insideSvgCoordinates, colorFromIntensity, findClosestCarbonValue, formatNumber} from './utils'
 import {getData} from "./data";
 import {VictoryBar, VictoryChart, VictoryTooltip} from 'victory';
-import {VERTICAL_ORDER} from "./data/database";
+import {MAX_ALLOWANCE_PER_CAPITA, VERTICAL_ORDER} from "./data/database";
 
 const afterZoomParams = (prevState, coeff) => {
   // the scale gets bigger, so the x index is lower. The currentCarbonValue,
@@ -121,9 +121,9 @@ export class SvgChart extends Component{
 
     let divStyle = {
       // width: '80%',
-      height: fullsize ? '600px' : '',
+      height: fullsize ? '500px' : '100px',
       maxWidth: fullsize ? '1000px' : '400px',
-      maxHeight: fullsize ? '600px' : '100px',
+      width: fullsize ? '90%' : '400px',
       cursor: 'pointer',
       position: 'relative',
       paddingTop: fullsize ? '20px' : '',
@@ -136,16 +136,25 @@ export class SvgChart extends Component{
     if (fullsize){
       for (let dataType in this.state.closeItems){
         let card = this.state.closeItems[dataType];
-        closeItems.push(<li style={{cursor: 'pointer'}} onClick={() => this.handleItemClick(dataType, card.ixInType)}><img style={{width: '30px'}} src={'img/emojis/' + card.card.icon} alt={card.text}/>{card.text}</li>)
+        closeItems.push(<li key={dataType} style={{cursor: 'pointer'}} onClick={() => this.handleItemClick(dataType, card.ixInType)}><img style={{width: '30px'}} src={'img/emojis/' + card.card.icon} alt={card.text}/>{card.text}</li>)
       }
       bottomDiv = <div style={{height: '250px', cursor: 'default'}}>
         <ul style={{marginLeft: (this.state.curveX / SVG_WIDTH * 1000 - 150) + 'px',
                     listStyleType: 'none', textAlign: 'center', width: '300px'}}>
-          <h3 style={{fontSize: '2.7rem', marginBottom: 0}}>{formatNumber(this.state.currentCarbonValue)} kg CO2-eq</h3>
+          <h3 style={{fontSize: '2.7rem', marginBottom: '1.5rem'}}>{formatNumber(this.state.currentCarbonValue)} kg CO2-eq</h3>
           <h3 style={{fontSize: '2.3rem', marginBottom: 0}}>items with similar footprint</h3>
           {closeItems}
         </ul>
       </div>
+    }
+
+    // max allowance of 2000kg per person, red line
+    let maxLine = '';
+    let maxText = '';
+    if (this.state.fullSize){
+      let maxAllowanceHeight = SVG_HEIGHT * (1 - MAX_ALLOWANCE_PER_CAPITA / this.state.maxCarbonValue);
+      maxLine = <line x1={0} x2={SVG_WIDTH} y1={maxAllowanceHeight} y2={maxAllowanceHeight} strokeWidth={1} stroke={'red'}/>;
+      maxText = <text x={5} y={maxAllowanceHeight - 5} fontSize={8} fill={'red'}>max yearly carbon allowance per capita</text>;
     }
 
     return <div style={divStyle}
@@ -162,6 +171,8 @@ export class SvgChart extends Component{
         <line x1={this.state.curveX} y1={SVG_HEIGHT} x2={this.state.curveX} y2={this.state.curveY}
               stroke={'black'} strokeWidth={4} pointerEvents={'none'} />
         <circle r={10} cx={this.state.curveX} cy={this.state.curveY} fill={'black'} pointerEvents={'none'} />
+        {maxLine}
+        {maxText}
       </svg>
       {/*<p style={{textAlign: 'center'}}>{this.state.currentCarbonValue}</p>*/}
       {bottomDiv}
