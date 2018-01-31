@@ -67,3 +67,35 @@
     position: absolute;
     transition: top 0.4s ease-in-out;
 }
+.simpleSelect{
+    border: none;
+    background: transparent;
+    text-decoration: underline;
+    padding: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 0;
+    text-overflow: '';
+    text-align: center;
+}
+select::-ms-expand {
+    display: none;
+}
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+*{
+    outline: none !important;
+}
+select:focus {
+    border: none !important;
+    outline: 0;
+}
+.simpleInput{
+    border: none !important;
+    background: transparent !important;
+    text-align: center;
+    text-decoration: underline;
+    width: 80px;
+}

@@ -34,16 +34,12 @@ export const DATABASE = {
           value: 100,
         },
         {
-          name: 'A car lifetime carbon emissions',
-          value: 150000,
-        },
-        {
           name: 'How much a car is used annualy',
           value: 10000,
         },
         {
           name: 'If you drive a lot during a year',
-          value: 80000,
+          value: 60000,
         },
       ],
       carbonBreakdown:{
@@ -509,9 +505,9 @@ export const DATABASE = {
   ],
   'items': [
     {
-      name: 'phone',
+      name: 'iPhone 6',
       icon: 'phone.svg',
-      carbonIntensity: 1,
+      carbonIntensity: 95,
       possibleValues: [
         {
           name: '',
@@ -565,91 +561,84 @@ export const DATABASE = {
       ]
     },
     {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 100,
+      name: 'Latptop life cycle',
+      icon: 'computer.svg',
+      carbonIntensity: 400,
       possibleValues: [
         {
           name: '',
           value: 1,
-        }
+        },
       ]
     },
     {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 500,
+      name: 'Amazon Kindle',
+      icon: 'kindle.svg',
+      carbonIntensity: 200,
       possibleValues: [
         {
           name: '',
           value: 1,
-        }
+        },
       ]
     },
     {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 1000,
+      name: 'A book',
+      icon: 'book.svg',
+      carbonIntensity: 3,
       possibleValues: [
         {
           name: '',
           value: 1,
-        }
+        },
       ]
     },
     {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 2000,
+      name: 'Cotton (1 kg)',
+      icon: 'cotton.jpg',
+      carbonIntensity: 8,
       possibleValues: [
         {
           name: '',
           value: 1,
-        }
+        },
       ]
     },
     {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 5000,
+      name: 'Glass (1 kg)',
+      icon: 'glass.svg',
+      carbonIntensity: 8.5,
       possibleValues: [
         {
           name: '',
           value: 1,
-        }
+        },
       ]
     },
     {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 10000,
+      name: 'Recycled glass (1 kg)',
+      icon: 'glass.svg',
+      carbonIntensity: 1.4,
       possibleValues: [
         {
           name: '',
           value: 1,
-        }
+        },
       ]
     },
     {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 0.1,
+      name: 'Gold',
+      icon: 'gold.svg',
+      carbonIntensity: 12000,
       possibleValues: [
         {
-          name: '',
+          name: '1 kg',
           value: 1,
-        }
-      ]
-    },
-    {
-      name: 'phone',
-      icon: 'phone.svg',
-      carbonIntensity: 0.01,
-      possibleValues: [
+        },
         {
-          name: '',
-          value: 1,
-        }
+          name: 'a ring',
+          value: 0.005,
+        },
       ]
     },
   ]

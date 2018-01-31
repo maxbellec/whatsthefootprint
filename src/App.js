@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './css/App.css';
 import {SvgChart} from './charts';
-import {Slider} from './cards/cards';
+import {Slider, VegetableWidget} from './cards/cards';
 import {buildAllCards, cardFromData, findClosestCarbonValue, UNIT_FROM_VERTICAL} from "./utils";
 import {Header} from "./header";
 import {DATABASE, VERTICAL_ORDER} from "./data/database";
@@ -196,6 +196,7 @@ class App extends Component {
         <Header handleSearchResult={this.handleSearchResult} searchValue={this.state.searchValue}
                 updateSearchValue={this.updateSearchValue} searchResults={this.state.searchResults}
                 handleSearchChange={this.handleSearchChange}/>
+        {/*<VegetableWidget name={'Tomato'} />*/}
         <SvgChart carbonValue={this.currentCard().carbonValue} cards={this.state.cards}
                   moveToPosition={this.moveToPosition}/>
         {/*<SvgChart />*/}

@@ -1,7 +1,5 @@
 import React, {Component} from "react";
 import {insideSvgCoordinates, colorFromIntensity, findClosestCarbonValue, formatNumber} from './utils'
-import {getData} from "./data";
-import {VictoryBar, VictoryChart, VictoryTooltip} from 'victory';
 import {VERTICAL_ORDER, YEARLY_PER_CAPITA_CARBON_ALLOWANCE} from "./data/database";
 
 const afterZoomParams = (prevState, coeff) => {
@@ -32,6 +30,7 @@ export class SvgChart extends Component{
       fullSize: false,
     }
   }
+
   handleMouseOver = (ev) => {
     if (!this.state.fullSize)
       return;
@@ -85,8 +84,6 @@ export class SvgChart extends Component{
                                 this.state.maxCarbonValue));
   };
 
-
-
   handleClick = () => {
     console.log('click on chart');
     if (!this.state.fullSize)
@@ -108,7 +105,6 @@ export class SvgChart extends Component{
     this.props.moveToPosition(VERTICAL_ORDER.indexOf(dataType), ixInType);
     this.handleClose();
   };
-
 
   render(){
     let svgPath = ("M0," + SVG_HEIGHT + " c" + SVG_WIDTH / 3 + ",0 " + SVG_WIDTH * 2 / 3 + ",0 " +
@@ -139,7 +135,7 @@ export class SvgChart extends Component{
 
       }
       bottomDiv = <div style={{height: '250px', cursor: 'default'}}>
-        <ul style={{marginLeft: (this.state.curveX / SVG_WIDTH * 1000 - 150) + 'px',
+        <ul style={{marginLeft: 'calc(' + (100 * this.state.curveX / SVG_WIDTH) + '% - 150px)',
                     listStyleType: 'none', textAlign: 'center', width: '300px'}}>
           <h3 style={{fontSize: '2.7rem', marginBottom: '1.5rem'}}>{formatNumber(this.state.currentCarbonValue)} kg CO2-eq</h3>
           <h3 style={{fontSize: '2.3rem', marginBottom: 0}}>items with similar footprint</h3>
@@ -157,6 +153,18 @@ export class SvgChart extends Component{
       maxText = <text x={5} y={maxAllowanceHeight - 5} fontSize={8} fill={'red'}>max yearly carbon allowance per capita</text>;
     }
 
+    let lineAndCircleX = this.state.curveX;
+    let lineAndCircleY = this.state.curveY;
+    if (this.state.fullSize){
+      console.log('fullSize, lineAndCircleX ', lineAndCircleX);
+    }
+    else{
+      let prop = this.props.carbonValue / this.state.maxCarbonValue;
+      lineAndCircleX = (prop)**(1/3) * SVG_WIDTH;
+      lineAndCircleY = (1 - prop) * SVG_HEIGHT;
+      console.log('smallSize, lineAndCircleX ', lineAndCircleX, lineAndCircleY);
+    }
+
     return <div style={divStyle}
                 className="container" onClick={this.handleClick}>
       <img src="/img/close.svg" alt="close" onClick={this.handleClose} style={{position: 'absolute', right: '3%', top: '-2vw', maxWidth: '60px', width: fullsize ? '6vw' : '0', transition: 'width 0.4s ease-in-out'}}/>
@@ -167,9 +175,9 @@ export class SvgChart extends Component{
         <path d={svgPath}
               fill="none" strokeWidth="2" stroke="black"/>
         <path d={svgPath + " L800,200 z"} fill="rgba(0,0,0,0.2)" stroke="none" />
-        <line x1={this.state.curveX} y1={SVG_HEIGHT} x2={this.state.curveX} y2={this.state.curveY}
+        <line x1={lineAndCircleX} y1={SVG_HEIGHT} x2={lineAndCircleX} y2={lineAndCircleY}
               stroke={'black'} strokeWidth={4} pointerEvents={'none'} />
-        <circle r={10} cx={this.state.curveX} cy={this.state.curveY} fill={'black'} pointerEvents={'none'} />
+        <circle r={10} cx={lineAndCircleX} cy={lineAndCircleY} fill={'black'} pointerEvents={'none'} />
         {maxLine}
         {maxText}
       </svg>

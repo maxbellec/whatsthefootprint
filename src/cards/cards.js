@@ -138,7 +138,7 @@ class Card extends Component{
         <div>
           <img src={'img/emojis/' + this.props.data.icon} alt={this.props.data.name} style={{maxWidth: '50px', maxHeight: '50px'}}/>
         </div>
-        <h4 style={{fontSize: '2.2rem', marginBottom: 0}}>{this.props.data.name + ' (' + this.props.data.value.value + ' kg)'}</h4>
+        <h4 style={{fontSize: '2.2rem', marginBottom: 0}}>{this.props.data.nameWithValue}</h4>
         <h4 style={{fontSize: '2rem'}}>{valueName}</h4>
         <h6>{formatNumber(this.props.data.carbonValue)} kg CO2 eq</h6>
         {/*{bottom}*/}
@@ -147,6 +147,89 @@ class Card extends Component{
     return <div className={'card ' + (this.props.central ? 'card-central' : '')}
                 onClick={this.props.handleClick} style={{cursor: 'pointer'}}>
       {inside}
+    </div>
+  }
+}
+
+export const KG_FOOD_PER_PRODUCER_TRUCK = 1000;  // kg
+export const PRODUCER_FUEL_INTENSITY = 0.4; // kg CO2-eq / km
+export const PRODUCER_DISTANCE_INTENSITY = PRODUCER_FUEL_INTENSITY / KG_FOOD_PER_PRODUCER_TRUCK;
+export const ORGANIC_PRODUCTIVITY_FACTOR = 0.8;
+export const GREENHOUSE_INTENSITY = 0.1; // kg CO2-eq / kg food
+export const PESTICIDES_INTENSITIES = {
+  tomato: 1,
+};
+export const MACHINE_CONSUMPTIONS = {
+  tomato: 1,
+};
+
+export class VegetableWidget extends Component{
+  constructor(){
+    super();
+    this.state = {
+      whereGrownValue: 'field',
+      organic: false,
+      producerDistance: 300, // km
+      carbonValue: 0,
+    }
+  };
+
+  componentDidMount = () => {this.updateCarbonValue()};
+
+  updateCarbonValue = () => {
+    console.log('update carbon value', this.state.whereGrownValue, this.state.organic);
+    if (this.state.whereGrownValue === 'garden'){
+      let carbonValue = this.state.organic ? 0 : PESTICIDES_INTENSITIES[this.props.name.toLowerCase()]; // kg CO2-eq / kg of food
+      console.log('in the garden', this.state.organic, carbonValue);
+      this.setState({carbonValue: carbonValue});
+      return;
+    }
+    let organicFactor = this.organic ? ORGANIC_PRODUCTIVITY_FACTOR : 1;
+    let carbonValue = (MACHINE_CONSUMPTIONS[this.props.name.toLowerCase()] / organicFactor +
+      this.state.producerDistance * PRODUCER_DISTANCE_INTENSITY
+      + (this.state.whereGrownValue === 'greenhouse') * GREENHOUSE_INTENSITY); // kg CO2-eq / kg of food
+    this.setState({carbonValue: carbonValue});
+  };
+
+  handleDistanceChange = (ev) => {
+    this.setState({producerDistance: ev.target.value}, this.updateCarbonValue);
+  };
+
+  handleWhereGrownChange= (ev) => {
+    console.log('where grown change', ev.target.value);
+    this.setState({whereGrownValue: ev.target.value}, this.updateCarbonValue);
+  };
+
+  handleOrganicChange= (ev) => {
+    console.log('organic change', ev.target.value);
+    this.setState({organic: ev.target.value}, this.updateCarbonValue);
+  };
+
+  render(){
+    let whereGrown = <select className={'simpleSelect'} value={this.state.whereGrownValue} onChange={this.handleWhereGrownChange}>
+      <option value={'field'}>in a field</option>
+      <option value={'greenhouse'}>in a greenhouse</option>
+      <option value={'garden'}>in your garden</option>
+    </select>;
+
+    let organic = <select className={'simpleSelect'} value={this.state.organic} onChange={this.handleOrganicChange}>
+      <option value={true}>organically</option>
+      <option value={false}>conventionally</option>
+    </select>;
+
+    let producerDistance = '';
+
+    if (this.state.whereGrownValue !== 'garden'){
+      producerDistance = <span>The producer is
+        <input name={'producerDistance'} value={this.state.producerDistance} type={'number'}
+               onChange={this.handleDistanceChange} className={'simpleInput'}/>
+        km from the shop.
+      </span>;
+    }
+
+    return <div>
+      {this.props.name} grown {whereGrown}, {organic}. {producerDistance}
+      <p>{formatNumber(this.state.carbonValue)}</p>
     </div>
   }
 }

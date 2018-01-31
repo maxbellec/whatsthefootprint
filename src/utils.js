@@ -77,7 +77,13 @@ const roundNumber = (number, rounding) => {
   return decimalAdjust('round', number, rounding);
 };
 
-const exponentOfNumber = (number) => Math.floor(Math.log10(number));
+const exponentOfNumber = (number) => {
+  if (number === 0){
+    return 0;
+  }
+  number = Math.abs(number);
+  return Math.floor(Math.log10(number))
+};
 
 export const formatNumber = (number) => {
   let exponent = exponentOfNumber(number);
