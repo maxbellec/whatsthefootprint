@@ -193,6 +193,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <DoNotShare />
         <Header handleSearchResult={this.handleSearchResult} searchValue={this.state.searchValue}
                 updateSearchValue={this.updateSearchValue} searchResults={this.state.searchResults}
                 handleSearchChange={this.handleSearchChange}/>
@@ -208,6 +209,14 @@ class App extends Component {
 
       </div>
     );
+  }
+}
+
+class DoNotShare extends Component{
+  render (){
+    return <div style={{textAlign: 'center', backgroundColor: '#f0ff00'}}>
+      <p>Please do not share this website. This is a prototype and is only meant to be seen by friends of this project.</p>
+    </div>
   }
 }
 

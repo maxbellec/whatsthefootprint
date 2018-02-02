@@ -583,7 +583,7 @@ export const DATABASE = {
       ]
     },
     {
-      name: 'A book',
+      name: 'Book',
       icon: 'book.svg',
       carbonIntensity: 3,
       possibleValues: [

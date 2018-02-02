@@ -34,10 +34,15 @@ let foodItems = makeItemsList(ITEMS['food']);
 let transportMeansItems = makeItemsList(ITEMS['transport']);
 let itemsItems = makeItemsList(ITEMS['items']);
 
-
 const FoodItems = {
   describe(){
     return <list id={'foodItem'} items={foodItems} limit={3}/>;
+  }
+};
+
+const ItemsItems = {
+  describe(){
+    return <list id={'itemsItem'} items={itemsItems} limit={3}/>;
   }
 };
 
@@ -65,6 +70,12 @@ const TransportQualifier = {
 };
 
 const FoodQualifier = {
+  describe(){
+    return <list items={['of']} limit={1}/>;
+  }
+};
+
+const ItemQualifier = {
   describe(){
     return <list items={['of']} limit={1}/>;
   }
@@ -134,11 +145,17 @@ const grammar = (
             <Space />
             <FoodItems id='item' limit={2}/>
           </sequence>
+
+          {/*items*/}
+          {/*<sequence argument='items'>*/}
+          <ItemsItems argument={'items'} id='item' limit={2}/>
+          {/*</sequence>*/}
         </choice>
 
       </sequence>
       <FoodItems id='item' argument='direct'/>
       <TransportMeans id='item' argument='direct'/>
+      <ItemsItems id='item' argument='direct'/>
     </choice>
   </sequence>
 );
