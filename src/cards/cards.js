@@ -66,8 +66,8 @@ export class Slider extends Component{
 
     let navigation = <div>
       {topButton}
-      <img src="/img/right_arrow.png" alt="right arrow" className={'rightArrow'} onClick={() => {console.log('CLICKARROW'); this.handleMoveRight()}}/>
-      <img src="/img/right_arrow.png" alt="right arrow" className={'leftArrow'} onClick={this.handleMoveLeft}/>
+      <img src="img/right_arrow.png" alt="right arrow" className={'rightArrow'} onClick={() => {console.log('CLICKARROW'); this.handleMoveRight()}}/>
+      <img src="img/right_arrow.png" alt="right arrow" className={'leftArrow'} onClick={this.handleMoveLeft}/>
       {bottomButton}
     </div>;
 

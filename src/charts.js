@@ -167,7 +167,7 @@ export class SvgChart extends Component{
 
     return <div style={divStyle}
                 className="container" onClick={this.handleClick}>
-      <img src="/img/close.svg" alt="close" onClick={this.handleClose} style={{position: 'absolute', right: '3%', top: '-2vw', maxWidth: '60px', width: fullsize ? '6vw' : '0', transition: 'width 0.4s ease-in-out'}}/>
+      <img src="img/close.svg" alt="close" onClick={this.handleClose} style={{position: 'absolute', right: '3%', top: '-2vw', maxWidth: '60px', width: fullsize ? '6vw' : '0', transition: 'width 0.4s ease-in-out'}}/>
       <svg width={'100%'} viewBox={'0 0 ' + SVG_WIDTH + ' ' +  SVG_HEIGHT}
            onMouseMove={this.handleMouseOver} id={'svgChart'}
            onMouseLeave={this.handleMouseLeave}>
